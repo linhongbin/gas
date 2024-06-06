@@ -1,0 +1,15 @@
+[submodule "ext/SurRoL"]
+	path = ext/SurRoL
+	url = https://github.com/linhongbin-ws/SurRoL.git
+[submodule "ext/DreamerfD"]
+	path = ext/DreamerfD
+	url = https://github.com/linhongbin/DreamerfD.git
+[submodule "ext/dreamerv2"]
+	path = ext/dreamerv2
+	url = https://github.com/linhongbin-ws/dreamerv2.git
+[submodule "ext/stable-baselines3"]
+	path = ext/stable-baselines3
+	url = https://github.com/linhongbin-ws/stable-baselines3
+[submodule "ext/Track-Anything"]
+	path = ext/Track-Anything
+	url = https://github.com/linhongbin-ws/Track-Anything.git
