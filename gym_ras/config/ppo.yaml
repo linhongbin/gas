@@ -1,0 +1,13 @@
+default:
+  baseline_name: ppo
+  logdir: ""
+  eval_freq: 2e5
+  eval_eps: 50
+  steps: 1820000
+dvrk:
+  eval_freq: 1
+  eval_eps: 50
+
+debug:
+  eval_eps: 3
+  eval_freq: 200

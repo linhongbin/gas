@@ -1,0 +1,620 @@
+default:
+  seed: 0
+  wrapper:
+    pipeline:
+      [ 
+        "ActionSmooth",
+        "ImageNoise",
+        "DepthProcess",
+        "DSA",
+        "VirtualClutch",
+        "ActionNoise",
+        "DiscreteAction",
+        "TimeLimit",
+        "FSM",
+        "OBS",
+      ]
+    ActionSmooth:
+      {
+        skip: true,
+        window: 3,
+        smooth_type: ema,
+      }
+    DSA:
+      {
+        zoom_box_obj: psm1,
+        encode_type: general_simple2,
+        cv_interpolate: area,
+        zoom_box_fix_length_ratio: 0.5,
+        encoding_id_needle: 60,
+        encoding_id_psm1: 130,
+        encoding_id_zoom_box: 30,
+        zoom_movement_type: continuous,
+      }
+    VirtualClutch: { start: 6 }
+    ActionNoise: { noise_scale: 0.0 }
+    DiscreteAction: { action_scale: 0.2 }
+    TimeLimit: { max_timestep: 200 }
+    DepthProcess: {skip: true, uncert_scale: 1.0, eval: false}
+    FSM: { arg: 0 }
+    OBS:
+      {
+        image_obs_key: ["dsa"],
+        vector_obs_key: ["gripper_state", "fsm_state"],
+        direct_map_key: ["fsm_state"],
+        direct_render_key: ["rgb", "depth"],
+        is_vector2image: true,
+        image_resize: [64, 64],
+        vector2image_type: "row",
+        dsa_out_zoom_anamaly: false,
+        action_insertion_anamaly: false,
+      }
+    ImageNoise: 
+      {
+        skip: true,
+        pns_noise_amount: 0.05,
+        pns_noise_balance: 0.5,
+        gaussian_blur_kernel: 3,
+        gaussian_blur_sigma: 0.8,
+        cutout_all_amount_range: [0.6, 1.0],
+        cutout_depth_amount_range: [0.7, 1.0],
+        cutout_line_num_low: 3,
+        cutout_line_num_high: 10,
+      }
+  task_name: needle_pick
+  embodied_name: SurrolEnv
+  embodied:
+    SurrolEnv:
+      pybullet_gui: false
+      cam_width: 600
+      cam_height: 600
+      mask_background_id: -3
+      depth_remap_range: 0.1
+      depth_remap_range_noise: 0.0
+      depth_remap_center_noise: 0.0
+      cam_target_noise: 0.0
+      cam_distance_noise: 0.0
+      cam_yaw_noise: 0.0
+      cam_pitch_noise: 0.0
+      cam_roll_noise: 0.0
+      cam_up_axis_noise: 0.0
+      background_texture_dir: ""
+      cam_mode: "rgbdm"
+      cam_num: 1
+      no_depth_link: false
+      mask_except_gripper: false
+      reward_done_success: 1
+      reward_done_fail: -0.1
+      reward_prog_norm: -0.001
+      reward_prog_abnorm_1: -0.01
+      reward_prog_abnorm_2: -0.001
+      reward_prog_abnorm_3: -0.001 
+      disturbance_scale: 0.0
+      cam_dynamic_noise_scale: 0.0
+      dr_scale_train: 1
+      dr_scale_eval: 1
+      needle_pick:
+        fix_goal: true
+        noise_scale: 1.0
+        done_z_thres: 0.2
+        init_pose_ratio_low_gripper: [-0.5, -0.5, -0.5, -0.9]
+        init_pose_ratio_high_gripper: [0.5, 0.5, 0.5, 0.9]
+        init_pose_ratio_low_needle: [-0.5, -0.5, 0.1, -0.99]
+        init_pose_ratio_high_needle: [0.5, 0.5, 0.5, 0.99]
+        random_obj_vis: false
+        depth_distance: 0.3
+      gauze_retrieve:
+        fix_goal: true
+        noise_scale: 1.0
+        done_z_thres: 0.2
+        init_pose_ratio_low_gripper: [-0.5, -0.5, -0.5, -0.9]
+        init_pose_ratio_high_gripper: [0.5, 0.5, 0.5, 0.9]
+        init_pose_ratio_low_stuff: [-0.5, -0.5, 0.1, -0.99]
+        init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99]
+        random_obj_vis: false
+        depth_distance: 0.3
+      peg_transfer:
+        fix_goal: true
+        noise_scale: 1.0
+        done_z_thres: 0.2
+        init_pose_ratio_low_gripper: [-0.5, -0.5, -0.5, -0.9]
+        init_pose_ratio_high_gripper: [0.5, 0.5, 0.5, 0.9]
+        init_pose_ratio_low_stuff: [-0.5, -0.5, 0.1, -0.99]
+        init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99]
+        random_obj_vis: false
+        depth_distance: 0.3
+      grasp_any:
+        stuff_name: needle
+        fix_goal: true
+        noise_scale: 1.0
+        done_z_thres: 0.2
+        init_pose_ratio_low_gripper: [-0.5, -0.5, -0.5, -0.9]
+        init_pose_ratio_high_gripper: [0.5, 0.5, 0.5, 0.9]
+        init_pose_ratio_low_stuff: [-0.5, -0.5, 0.1, -0.99]
+        init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99]
+        random_obj_vis: false
+        depth_distance: 0.3
+    dVRKEnv:
+      grasp_any:
+        arm_names: ["PSM1"]
+        rgbd_device: "rs435"
+        oracle_device: "ds4"
+        ws_x: [-0.1, 0.1]
+        ws_y: [-0.1, 0.1]
+        ws_z: [-0.24, 0.0]
+        psm_reset_q: [0.0, 0.0, 0.12, 0.0, 0.0, 0.0]
+        psm_open_gripper_deg: 40.0
+        psm_init_gripper_quat: [7.07106781e-01, 7.07106781e-01, 0.0, 0.0]
+        psm_init_pose_low_gripper: [-0.5, -0.5, -0.5, -0.9]
+        psm_init_pose_high_gripper: [0.5, 0.5, 0.5, 0.9]
+        psm_max_step_pos: 0.01
+        psm_max_step_rot: 20.0
+        cam_image_height: 600
+        cam_image_width: 600
+        cam_depth_remap_center: -1.0
+        cam_depth_remap_range: -1.0
+        dvrk_cal_file: ""
+        cam_segment_tool: ""
+        cam_segment_model_dir: ""
+        cam_cal_file: ""
+        done_cal_file: ""
+        cam_mask_noisy_link: true
+
+
+#### dvrk ###
+
+dvrk_sim:
+  embodied_name: dVRKEnv
+
+dvrk_sim_dsa:
+  embodied_name: dVRKEnv
+  embodied.dVRKEnv.grasp_any.cam_cal_file: "./data/dvrk_cal/cam_cal.yaml"
+  embodied.dVRKEnv.grasp_any.cam_segment_tool: "detectron"
+  embodied.dVRKEnv.grasp_any.cam_segment_model_dir: "./data/segment_model"
+
+dvrk_real:
+  embodied_name: dVRKEnv
+  embodied.dVRKEnv.grasp_any.dvrk_cal_file: "./data/dvrk_cal/dvrk_cal.yaml"
+dvrk_real_dsa:
+  embodied_name: dVRKEnv
+  embodied.dVRKEnv.grasp_any.dvrk_cal_file: "./data/dvrk_cal/dvrk_cal.yaml"
+  embodied.dVRKEnv.grasp_any.cam_cal_file: "./data/dvrk_cal/cam_cal.yaml"
+  embodied.dVRKEnv.grasp_any.done_cal_file: "./data/dvrk_cal/done_cal.yaml"
+  embodied.dVRKEnv.grasp_any.cam_segment_tool: "detectron"
+  embodied.dVRKEnv.grasp_any.cam_segment_model_dir: "./data/segment_model"
+  wrapper.DepthProcess.eval: true
+
+large_action_scale:
+  wrapper.DiscreteAction.action_scale: 0.4
+color_seg:
+  embodied.dVRKEnv.grasp_any.cam_segment_tool: "color"
+  embodied.dVRKEnv.grasp_any.cam_segment_model_dir: "./data/dvrk_cal/color_seg_cal.yaml"
+
+############## task ###############
+needle_pick:
+  task_name: needle_pick
+gauze_retrieve:
+  task_name: gauze_retrieve
+peg_transfer:
+  task_name: peg_transfer
+grasp_needle:
+  task_name: grasp_any
+grasp_box:
+  task_name: grasp_any
+  embodied.SurrolEnv.grasp_any.stuff_name: "box"
+grasp_cylinder:
+  task_name: grasp_any
+  embodied.SurrolEnv.grasp_any.stuff_name: "cylinder"
+grasp_any:
+  task_name: grasp_any
+  embodied.SurrolEnv.grasp_any.stuff_name: "any"
+
+############# cam mode #################
+cam_rgbm:
+  embodied.SurrolEnv.cam_mode: "rgbm"
+  wrapper.OBS.direct_render_key: ["rgb"]
+
+
+vector2image_pixel:
+  wrapper.OBS.vector2image_type: "pixel"
+
+large_depth_uncertainty:
+  wrapper.DepthProcess.uncert_scale: 2.0
+
+low_depth_uncertainty:
+  wrapper.DepthProcess.uncert_scale: 0.5
+
+############# cam mode #################
+cam_rgbm_dual:
+  embodied.SurrolEnv.cam_mode: "rgbm"
+  wrapper.OBS.direct_render_key: ["rgb"]
+  embodied.SurrolEnv.cam_num: 2
+
+############## image noise ###############
+
+image_noise:
+  wrapper.ImageNoise.skip: false
+image_noise_low:
+  wrapper.ImageNoise.skip: false
+  wrapper.ImageNoise.cutout_all_amount_range: [0.9, 1.0]
+  wrapper.ImageNoise.cutout_depth_amount_range: [0.9, 1.0]
+
+
+image_noise_real:
+  wrapper.ImageNoise.skip: false
+  wrapper.ImageNoise.cutout_all_amount_range: [0.54, 1.0]
+  wrapper.ImageNoise.cutout_depth_amount_range: [1.0, 1.0]
+  wrapper.ImageNoise.cutout_line_num_low: 0
+  wrapper.ImageNoise.cutout_line_num_high: 0
+
+image_noise_real_high:
+  wrapper.ImageNoise.skip: false
+  wrapper.ImageNoise.cutout_all_amount_range: [0.0, 1.0]
+  wrapper.ImageNoise.cutout_depth_amount_range: [1.0, 1.0]
+  wrapper.ImageNoise.cutout_line_num_low: 0
+  wrapper.ImageNoise.cutout_line_num_high: 0
+
+no_depth_link:
+  embodied.SurrolEnv.no_depth_link: true
+
+depth_process:
+  wrapper.DepthProcess.skip: false
+
+mask_except_gripper:
+  embodied.SurrolEnv.mask_except_gripper: true
+
+
+
+############## large texture ########
+large_texture:
+  embodied.SurrolEnv.background_texture_dir: "./data/surgical_image/"
+############### noise ############################
+
+dvrk_cam_setting:
+  embodied.SurrolEnv:
+      {
+        cam_target_noise: 1e-2,
+        cam_distance_noise: 5e-2,
+        cam_pitch_noise: 10e0,
+        cam_roll_noise: 11e0,
+        cam_up_axis_noise: 5e0,
+        depth_remap_range_noise: 1e-2, 
+        depth_remap_center_noise: 1e-2, 
+        no_depth_link: true,
+      }
+  wrapper.DepthProcess.skip: false
+  wrapper.DepthProcess.uncert_scale: 1.5
+
+cam_dynamic:
+  embodied.SurrolEnv.cam_dynamic_noise_scale: 0.1
+
+dvrk_init_pose_setting:
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+
+dvrk_init_pose_setting_grasp_any:
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff: [-0.8, -0.8, 0.1, -0.99]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99]
+  wrapper.TimeLimit: { max_timestep: 300 }
+
+# cam pose noise
+cam_pose_noise_low:
+  embodied.SurrolEnv:
+    {
+      cam_target_noise: 5e-3,
+      cam_distance_noise: 5e-2,
+      cam_pitch_noise: 6e0,
+      cam_roll_noise: 11e0,
+      cam_up_axis_noise: 10e0,
+    }
+cam_pose_noise_medium:
+  embodied.SurrolEnv:
+    {
+      cam_target_noise: 10e-3,
+      cam_distance_noise: 10e-2,
+      cam_pitch_noise: 12e0,
+      cam_roll_noise: 22e0,
+      cam_up_axis_noise: 22e0,
+    }
+cam_pose_noise_high:
+  embodied.SurrolEnv:
+    {
+      cam_target_noise: 20e-3,
+      cam_distance_noise: 20e-2,
+      cam_pitch_noise: 25e0,
+      cam_roll_noise: 45e0,
+      cam_up_axis_noise: 45e0,
+    }
+cam_pose_noise_debug:
+  embodied.SurrolEnv:
+    {
+      cam_target_noise: 0e-3,
+      cam_distance_noise: 20e-2,
+      cam_pitch_noise: 0e0,
+      cam_roll_noise: 0e0,
+      cam_up_axis_noise: 0e0,
+    }
+
+# depth remap noise
+depth_remap_noise_low:
+  embodied.SurrolEnv:
+    { depth_remap_range_noise: 1e-2, depth_remap_center_noise: 1e-2 }
+depth_remap_noise_medium:
+  embodied.SurrolEnv:
+    { depth_remap_range_noise: 2e-2, depth_remap_center_noise: 2e-2 }
+depth_remap_noise_high:
+  embodied.SurrolEnv:
+    { depth_remap_range_noise: 5e-3, depth_remap_center_noise: 3e-2 }
+
+# action noise
+action_noise_low:
+  wrapper.ActionNoise.noise_scale: 0.07
+action_noise_low2:
+  wrapper.ActionNoise.noise_scale: 0.04
+action_noise_medium:
+  wrapper.ActionNoise.noise_scale: 0.15
+action_noise_high:
+  wrapper.ActionNoise.noise_scale: 0.3
+
+action_smooth:
+  wrapper.ActionSmooth.skip: False
+  wrapper.ActionSmooth.window: 3
+
+################## observation ############################
+# vector observation
+vec_obs:
+  wrapper:
+    OBS:
+      {
+        image_obs_key: ["dsa"],
+        vector_obs_key: ["gripper_state", "fsm_state", "robot_prio"],
+        direct_map_key: ["fsm_state"],
+        is_vector2image: False,
+        image_resize: [64, 64],
+      }
+vec_obs2:
+  wrapper:
+    OBS:
+      {
+        image_obs_key: ["dsa"],
+        vector_obs_key: ["gripper_state", "fsm_state"],
+        direct_map_key: ["fsm_state"],
+        is_vector2image: False,
+        image_resize: [64, 64],
+      }
+
+# image representation
+dsa_1:
+  wrapper.DSA.encode_type: general_simple
+dsa_2:
+  wrapper.DSA.encode_type: general_simple2
+dsa_3:
+  wrapper.DSA.encode_type: general_simple3
+dsa_iros2023:
+  wrapper.DSA.encode_type: IROS2023
+  wrapper.DSA.zoom_box_obj: needle
+dsa_discrete:
+  wrapper.DSA.zoom_movement_type: discrete
+
+dsa_zoom_high:
+  wrapper.DSA.zoom_box_fix_length_ratio: 0.3
+
+############### others ##############################################
+timelimit_debug:
+  wrapper.TimeLimit: { max_timestep: 1 }
+timelimit_high:
+  wrapper.TimeLimit: { max_timestep: 500 }
+
+timelimit_debug2:
+  wrapper.TimeLimit: { max_timestep: 3 }
+timelimit_debug3:
+  wrapper.TimeLimit: { max_timestep: 100000000000 }
+
+gui:
+  embodied.SurrolEnv.pybullet_gui: true
+
+no_resize:
+  wrapper.OBS.image_resize: [-1, -1]
+
+no_wrapper:
+  wrapper.pipeline: [none]
+
+segment:
+  wrapper.pipeline: ["ImageNoise", "DiscreteAction"]
+  embodied.SurrolEnv.background_texture_dir: "./data/surgical_image/"
+
+########reward ####
+reward2:
+  embodied.SurrolEnv.reward_done_success: 1
+  embodied.SurrolEnv.reward_done_fail: -0.2
+  embodied.SurrolEnv.reward_prog_norm: 0
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.04
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.04
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.01  
+reward3:
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.002
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.002  
+
+reward4: 
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.009 
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.001 
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.003 
+reward5:
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01 
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
+  embodied.SurrolEnv.reward_done_fail: -0.1
+  embodied.SurrolEnv.reward_prog_norm: -0.001
+  embodied.SurrolEnv.reward_done_success: 1
+reward6:
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.05 
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.05 # sliding
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
+  embodied.SurrolEnv.reward_done_fail: -0.001
+  embodied.SurrolEnv.reward_prog_norm: -0.001
+  embodied.SurrolEnv.reward_done_success: 1
+
+dsa_anomaly:
+   wrapper.OBS.dsa_out_zoom_anamaly: true
+
+###### disturbance ########
+disturbance:
+  embodied.SurrolEnv.disturbance_scale: 0.03
+
+disturbance2:
+  embodied.SurrolEnv.disturbance_scale: 0.01
+
+####### workspace ##########3
+dvrk_full_ws:
+  embodied.dVRKEnv.grasp_any.psm_init_pose_low_gripper: [-0.95, -0.95, -0.95, -0.95]
+  embodied.dVRKEnv.grasp_any.psm_init_pose_high_gripper: [0.95, 0.95, 0.95, 0.95]
+
+surrol_grasp_any:
+  ## dvrk_cam_setting
+  embodied.SurrolEnv.cam_target_noise: 1e-2
+  embodied.SurrolEnv.cam_distance_noise: 5e-2
+  embodied.SurrolEnv.cam_pitch_noise: 10e0
+  embodied.SurrolEnv.cam_roll_noise: 11e0
+  embodied.SurrolEnv.cam_up_axis_noise: 5e0
+  embodied.SurrolEnv.depth_remap_range_noise: 1e-2
+  embodied.SurrolEnv.depth_remap_center_noise: 1e-2
+  embodied.SurrolEnv.no_depth_link: true
+  wrapper.DepthProcess.skip: false
+  wrapper.DepthProcess.uncert_scale: 1.5
+  ## dvrk_init_pose_setting
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+  ## dsa_zoom_high
+  wrapper.DSA.zoom_box_fix_length_ratio: 0.3
+  ## grasp_any
+  task_name: grasp_any
+  embodied.SurrolEnv.grasp_any.stuff_name: "any"
+  # image_noise_real
+  wrapper.ImageNoise.skip: false
+  wrapper.ImageNoise.cutout_all_amount_range: [0.54, 1.0]
+  wrapper.ImageNoise.cutout_depth_amount_range: [1.0, 1.0]
+  wrapper.ImageNoise.cutout_line_num_low: 0
+  wrapper.ImageNoise.cutout_line_num_high: 0
+  # cam_dynamic:
+  embodied.SurrolEnv.cam_dynamic_noise_scale: 0.1
+  # dsa_3:
+  wrapper.DSA.encode_type: general_simple3
+
+
+dvrk_grasp_any:
+  # dvrk_real_dsa
+  embodied_name: dVRKEnv
+  embodied.dVRKEnv.grasp_any.dvrk_cal_file: "./data/dvrk_cal/dvrk_cal.yaml"
+  embodied.dVRKEnv.grasp_any.cam_cal_file: "./data/dvrk_cal/cam_cal.yaml"
+  embodied.dVRKEnv.grasp_any.done_cal_file: "./data/dvrk_cal/done_cal.yaml"
+  wrapper.DepthProcess.eval: true
+  # color_seg
+  embodied.dVRKEnv.grasp_any.cam_segment_tool: "track_any"
+  embodied.dVRKEnv.grasp_any.cam_segment_model_dir: "./data/dvrk_cal/color_seg_cal.yaml"
+  # wrapper to eval
+  wrapper.ImageNoise.skip: true
+  wrapper.ActionNoise.noise_scale: 0.0
+  wrapper.TimeLimit.max_timestep: 300
+
+insertion_anamaly:
+  wrapper.OBS.action_insertion_anamaly: true
+vector2image_square:
+  wrapper.OBS.vector2image_type: "square"
+
+
+
+gas_surrol:
+  ## dvrk_cam_setting
+  embodied.SurrolEnv.cam_target_noise: 1e-2
+  embodied.SurrolEnv.cam_distance_noise: 5e-2
+  embodied.SurrolEnv.cam_pitch_noise: 10e0
+  embodied.SurrolEnv.cam_roll_noise: 11e0
+  embodied.SurrolEnv.cam_up_axis_noise: 5e0
+  embodied.SurrolEnv.depth_remap_range_noise: 1e-2
+  embodied.SurrolEnv.depth_remap_center_noise: 1e-2
+  embodied.SurrolEnv.no_depth_link: true
+  wrapper.DepthProcess.skip: false
+  wrapper.DepthProcess.uncert_scale: 1.5
+  ## dvrk_init_pose_setting
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+  ## dsa_zoom_high
+  wrapper.DSA.zoom_box_fix_length_ratio: 0.3
+  ## grasp_any
+  task_name: grasp_any
+  embodied.SurrolEnv.grasp_any.stuff_name: "any"
+  # image_noise_real
+  wrapper.ImageNoise.skip: false
+  wrapper.ImageNoise.cutout_all_amount_range: [0.54, 1.0]
+  wrapper.ImageNoise.cutout_depth_amount_range: [1.0, 1.0]
+  wrapper.ImageNoise.cutout_line_num_low: 0
+  wrapper.ImageNoise.cutout_line_num_high: 0
+  # cam_dynamic:
+  embodied.SurrolEnv.cam_dynamic_noise_scale: 0.1
+  # dsa_3:
+  wrapper.DSA.encode_type: general_simple3
+  # dsa_anomaly:
+  wrapper.OBS.dsa_out_zoom_anamaly: true
+  # reward5:
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01 
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
+  embodied.SurrolEnv.reward_done_fail: -0.1
+  embodied.SurrolEnv.reward_prog_norm: -0.001
+  embodied.SurrolEnv.reward_done_success: 1
+  # dvrk_init_pose_setting_grasp_any:
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff: [-0.8, -0.8, 0.1, -0.99]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99]
+  wrapper.TimeLimit: { max_timestep: 300 }
+  # disturbance2:
+  embodied.SurrolEnv.disturbance_scale: 0.01
+  # action_noise_low2:
+  wrapper.ActionNoise.noise_scale: 0.04
+  # vector2image_square:
+  wrapper.OBS.vector2image_type: "square"
+
+raw:
+  wrapper.DSA.encode_type: raw
+no_depth_estimation: 
+  wrapper.DepthProcess.skip: true
+
+no_clutch:
+  wrapper.VirtualClutch.start: 0
+
+# no_dm: # no domain randomization
+#   ## cam pose noise
+#   embodied.SurrolEnv.cam_target_noise: 0.0
+#   embodied.SurrolEnv.cam_distance_noise: 0.0
+#   embodied.SurrolEnv.cam_pitch_noise: 0.0
+#   embodied.SurrolEnv.cam_roll_noise: 0.0
+#   embodied.SurrolEnv.cam_up_axis_noise: 0.0
+#   embodied.SurrolEnv.depth_remap_range_noise: 0.0
+#   embodied.SurrolEnv.depth_remap_center_noise: 0.0
+#   # image sythetic noise
+#   wrapper.ImageNoise.skip: true
+#   # object disturbance
+#   embodied.SurrolEnv.disturbance_scale: 0.00
+#   # robot action noise
+#   wrapper.ActionNoise.noise_scale: 0.00
+
+no_dr: 
+  embodied.SurrolEnv.dr_scale_train: 0
+
+no_cam_noisy_mask:
+  embodied.dVRKEnv.grasp_any.cam_mask_noisy_link: False
+
+image_noise_on:
+  wrapper.ImageNoise.skip: false
+
+action_noise_on:
+  wrapper.ActionNoise.noise_scale: 0.04
