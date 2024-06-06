@@ -11,5 +11,6 @@ setup(name='gym_ras',
         'scikit-image',
         'pandas>=0.18',
         'pynput',
+        'pybullet==3.0.9',
         ], 
       packages=find_packages())
