@@ -42,6 +42,17 @@ Train `GAS`
 python ./run/rl_train.py --env-tag gas_surrol --baseline dreamerv2 --baseline-tag gas
 ```
 
+Train other baselines 
+(baseline names are commented at the end of command lines)
+```sh
+python ./run/rl_train.py --env-tag gas_surrol raw --baseline dreamerv2 --baseline-tag gas # GAS-Raw
+python ./run/rl_train.py --env-tag gas_surrol no_depth_estimation --baseline dreamerv2 --baseline-tag gas # GAS-NoDE
+python ./run/rl_train.py --env-tag gas_surrol no_clutch --baseline dreamerv2 --baseline-tag gas # GAS-NoClutch
+python ./run/rl_train.py --env-tag gas_surrol no_dm --baseline dreamerv2 --baseline-tag gas # GAS-NoDR
+python ./run/rl_train.py --env-tag gas_surrol raw no_clutch --baseline dreamerv2 --baseline-tag gas # DreamerV2
+python ./run/rl_train.py --env-tag gas_surrol raw no_clutch --baseline ppo # PPO
+```
+
 ## 3.2. Evaluation
 
 ### 3.2.1. Simulation
