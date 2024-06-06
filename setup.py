@@ -12,5 +12,6 @@ setup(name='gym_ras',
         'pandas>=0.18',
         'pynput',
         'pybullet==3.0.9',
+        'numpy<=1.23',
         ], 
       packages=find_packages())
