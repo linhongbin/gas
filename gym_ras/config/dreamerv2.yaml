@@ -186,7 +186,7 @@ gas:
   eval_every: 2e5
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  eval_eps: 50
+  eval_eps: 20
   # prefill: {random: 9e3, oracle: 1e3}
   replay.capacity: 5e5 # limit ram usage
   log_keys_video: ['image', 'rgb',]
