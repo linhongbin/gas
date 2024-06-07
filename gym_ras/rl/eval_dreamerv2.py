@@ -127,8 +127,11 @@ def eval_agnt(base_env, config, eval_eps_num, is_visualize=False, max_eps_length
 
   while True:  
     prefill_total = max(0, config.dataset.length - eval_replay.stats['total_steps'])
-    print(f"Prefill {prefill_total} episodes for evaluation, please wait.....")
+    print("")
+    print("======================")
+    print(f"Prefill {prefill_total} steps for evaluation, please wait.....")
     print(f"DreamerV2 need to first prefill dataset and create networks using such dataset under tensorflow framework.")
+    print("======================")
     if prefill_total:
       prefill_agent = common.RandomAgent(act_space)
       eval_driver(prefill_agent, episodes=1)
