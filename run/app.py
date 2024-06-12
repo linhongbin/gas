@@ -274,9 +274,9 @@ def vos_tracking_video(video_state, interactive_state, mask_dropdown):
     interactive_state["inference_times"] += 1
     
     print("For generating this tracking result, inference times: {}, click times: {}, positive: {}, negative: {}".format(interactive_state["inference_times"], 
-                                                                                                                                           interactive_state["positive_click_times"]+interactive_state["negative_click_times"],
-                                                                                                                                           interactive_state["positive_click_times"],
-                                                                                                                                        interactive_state["negative_click_times"]))
+                                                                                                        interactive_state["positive_click_times"]+interactive_state["negative_click_times"],
+                                                                                                        interactive_state["positive_click_times"],
+                                                                                                        interactive_state["negative_click_times"]))
 
     #### shanggao code for mask save
     if interactive_state["mask_save"]:

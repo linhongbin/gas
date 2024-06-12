@@ -7,9 +7,9 @@ import time
 from pathlib import Path
 import cv2
 parser = argparse.ArgumentParser(
-                    prog='ProgramName',
-                    description='What the program does',
-                    epilog='Text at the bottom of help')
+    prog='ProgramName',
+    description='What the program does',
+    epilog='Text at the bottom of help')
 
 # parser.add_argument('--repeat',type=int, default=1)
 # parser.add_argument('--action',type=str, default="3")
@@ -23,16 +23,16 @@ parser.add_argument('--save-tag', type=str, nargs='+', default=[])
 args = parser.parse_args()
 
 env, env_config = make_env(tags=args.env_tag, seed=args.seed)
-env =  Visualizer(env, update_hz=-1, keyboard=True)
+env = Visualizer(env, update_hz=-1, keyboard=True)
 obs = env.reset()
 while True:
     img = env.render()
     print(img.keys())
     if len(args.vis_tag) != 0:
-        img = {k:v for k,v in img.items() if k in args.vis_tag}
-    
+        img = {k: v for k, v in img.items() if k in args.vis_tag}
+
     img_break = env.cv_show(imgs=img)
-    if len(args.save_tag)!=0:
+    if len(args.save_tag) != 0:
         _render_dir = Path(args.save_dir)
         _render_dir.mkdir(exist_ok=True, parents=True)
         for k in args.save_tag:

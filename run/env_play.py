@@ -4,13 +4,13 @@ import argparse
 from tqdm import tqdm
 import time
 parser = argparse.ArgumentParser(
-                    prog='ProgramName',
-                    description='What the program does',
-                    epilog='Text at the bottom of help')
+    prog='ProgramName',
+    description='What the program does',
+    epilog='Text at the bottom of help')
 
-parser.add_argument('-p',type=int)
-parser.add_argument('--repeat',type=int, default=1)
-parser.add_argument('--action',type=str, default="oracle")
+parser.add_argument('-p', type=int)
+parser.add_argument('--repeat', type=int, default=1)
+parser.add_argument('--action', type=str, default="oracle")
 # parser.add_argument('--yaml-dir', type=str, default="./gym_ras/config.yaml")
 # parser.add_argument('--yaml-tag', type=str, nargs='+', default=[])
 parser.add_argument('--env-tag', type=str, nargs='+', default=[])
@@ -26,7 +26,8 @@ env, env_config = make_env(tags=args.env_tag, seed=args.seed)
 if args.action == 'oracle':
     env = ActionOracle(env, device=args.oracle)
 if not args.no_vis:
-    env =  Visualizer(env, update_hz=100 if args.action in ['oracle'] else -1, vis_tag=args.vis_tag, keyboard=not args.action in ['oracle'])
+    env = Visualizer(env, update_hz=100 if args.action in [
+                     'oracle'] else -1, vis_tag=args.vis_tag, keyboard=not args.action in ['oracle'])
 
 if args.eval:
     env.to_eval()
@@ -53,18 +54,19 @@ for _ in tqdm(range(args.repeat)):
         # print("step....")
         obs, reward, done, info = env.step(action)
         print_obs = obs.copy()
-        print_obs = {k: v.shape if k in ["image","rgb","depth"] else v for k,v in print_obs.items()}
-        print_obs = [str(k)+ ":" +str(v) for k,v in print_obs.items()]
+        print_obs = {k: v.shape if k in [
+            "image", "rgb", "depth"] else v for k, v in print_obs.items()}
+        print_obs = [str(k) + ":" + str(v) for k, v in print_obs.items()]
         print(" | ".join(print_obs))
         print("reward:", reward, "done:", done,)
-        print("info:",info)
-    
+        print("info:", info)
+
         # print("reward:", reward, "done:", done, "info:", info, "step:", env.timestep, "obs_key:", obs.keys(), "fsm_state:", obs["fsm_state"])
         # print("observation space: ", env.observation_space)
         start = time.time()
         # print(obs["image"])
         img = env.render()
-        print("render() elapse sec: ",time.time() - start)
+        print("render() elapse sec: ", time.time() - start)
         # print(img.keys())
         # print(img)
         img.update({"image": obs['image']})

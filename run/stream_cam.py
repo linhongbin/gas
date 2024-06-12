@@ -15,18 +15,18 @@ parser.add_argument('--vis-tag', type=str, nargs='+', default=[])
 args = parser.parse_args()
 
 
-engine = RS435_ROS_Engine(depth_remap_center=None if args.depth_c<=0 else args.depth_c,
-    depth_remap_range=None if args.depth_r<=0 else args.depth_r)
-visualizer = CV2_Visualizer( update_hz=10,
+engine = RS435_ROS_Engine(depth_remap_center=None if args.depth_c <= 0 else args.depth_c,
+                          depth_remap_range=None if args.depth_r <= 0 else args.depth_r)
+visualizer = CV2_Visualizer(update_hz=10,
                             render_dir=args.savedir,
                             vis_tag=args.vis_tag,
                             keyboard=True)
-is_seg = args.seg_type!=""
+is_seg = args.seg_type != ""
 if is_seg:
     if args.seg_type == "detectron":
         _dir = Path(args.seg_dir)
-        predictor = DetectronPredictor(model_dir= str(_dir / "model_best.pth"),
-                            cfg_dir=str(_dir / 'segment.yaml'))
+        predictor = DetectronPredictor(model_dir=str(_dir / "model_best.pth"),
+                                       cfg_dir=str(_dir / 'segment.yaml'))
     elif args.seg_type == "color":
         from gym_ras.tool.seg_tool import ColorObjSegmentor
         _dir = Path(args.seg_dir)
@@ -41,11 +41,11 @@ while not is_quit:
     if predictor is not None:
         masks = predictor.predict(img['rgb'])
         # print(masks)
-        if len(masks)>0:
-            img.update({"mask": {str(k): v[0] for k,v in masks.items()}})
+        if len(masks) > 0:
+            img.update({"mask": {str(k): v[0] for k, v in masks.items()}})
     # img.pop("depth", None)
     # img.pop("mask", None)
     visualizer.cv_show(img)
     is_quit = visualizer.cv_show(img)
-    
+
     # print(results)
