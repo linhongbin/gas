@@ -1,27 +1,28 @@
 default:
   baseline_name: DreamerfD
   action_repeat: 1
-  actor: {act: elu, dist: auto, layers: 4, min_std: 0.1, norm: none, units: 400}
-  actor_ent_weight: '2e-03'
+  actor:
+    { act: elu, dist: auto, layers: 4, min_std: 0.1, norm: none, units: 400 }
+  actor_ent_weight: "2e-03"
   actor_grad: auto
   actor_grad_mix: 0.1
   actor_rl_weight: 1.0
-  actor_opt: {clip: 100, eps: 1e-05, lr: 2e-05, opt: adam, wd: 1e-06}
-  actor_grad_scale: '1'
+  actor_opt: { clip: 100, eps: 1e-05, lr: 2e-05, opt: adam, wd: 1e-06 }
+  actor_grad_scale: "1"
   actor_type: ActorCritic
   atari_grayscale: true
   bc_agent_retrain: true
   bc_wm_retrain: true
   bc_dir: ./log
-  bc_grad_weight: '1.0'
+  bc_grad_weight: "1.0"
   bc_loss: true
   bc_skip_start_step_num: 2
   bc_wm_weight: "1.0"
   clip_rewards: identity
-  critic: {act: elu, dist: mse, layers: 4, norm: none, units: 400}
-  critic_opt: {clip: 100, eps: 1e-05, lr: 4e-05, opt: adam, wd: 1e-06}
-  critic_grad_scale: '1'
-  dataset: {batch: 70, length: 10}
+  critic: { act: elu, dist: mse, layers: 4, norm: none, units: 400 }
+  critic_opt: { clip: 100, eps: 1e-05, lr: 4e-05, opt: adam, wd: 1e-06 }
+  critic_grad_scale: "1"
+  dataset: { batch: 70, length: 10 }
   decoder:
     act: elu
     cnn_depth: 48
@@ -36,7 +37,7 @@ default:
   disag_offset: 1
   disag_target: stoch
   discount: 0.999
-  discount_head: {act: elu, dist: binary, layers: 4, norm: none, units: 400}
+  discount_head: { act: elu, dist: binary, layers: 4, norm: none, units: 400 }
   discount_lambda: 0.95
   dmc_camera: -1
   encoder:
@@ -57,12 +58,12 @@ default:
   eval_video_every: 3e4
   expl_behavior: greedy
   expl_extr_scale: 0.0
-  expl_head: {act: elu, dist: mse, layers: 4, norm: none, units: 400}
+  expl_head: { act: elu, dist: mse, layers: 4, norm: none, units: 400 }
   expl_intr_scale: 1.0
   expl_model_loss: kl
   expl_noise: 0.0
-  expl_opt: {clip: 100, eps: 1e-05, lr: 0.0003, opt: adam, wd: 1e-06}
-  expl_reward_norm: {eps: 1e-08, momentum: 1.0, scale: 1.0}
+  expl_opt: { clip: 100, eps: 1e-05, lr: 0.0003, opt: adam, wd: 1e-06 }
+  expl_reward_norm: { eps: 1e-08, momentum: 1.0, scale: 1.0 }
   expl_until: 0
   grad_extra_image_channel_scale: [0.0, 0.0, 0.0]
   grad_heads: [decoder, reward, discount]
@@ -71,16 +72,16 @@ default:
   is_pure_datagen: false
   is_pure_train: false
   jit: true
-  kl: {balance: 0.8, forward: false, free: 0.0, free_avg: true}
+  kl: { balance: 0.8, forward: false, free: 0.0, free_avg: true }
   log_every: 400.0
   log_keys_max: ^$
   log_keys_mean: ^$
   log_keys_sum: ^$
   log_keys_video: [image, rgb, depth]
   logdir: ./log
-  loss_scales: {discount: 1.0, kl: 1.0, proprio: 1.0, reward: 1.0}
-  model_opt: {clip: 100, eps: 1e-05, lr: 2e-4, opt: adam, wd: 1e-06}
-  model_grad_scale: '1'
+  loss_scales: { discount: 1.0, kl: 1.0, proprio: 1.0, reward: 1.0 }
+  model_opt: { clip: 100, eps: 1e-05, lr: 2e-4, opt: adam, wd: 1e-06 }
+  model_grad_scale: "1"
   offline_step: 20000000
   precision: 16
   pred_discount: true
@@ -88,12 +89,30 @@ default:
   prefill_agent: oracle
   pretrain: 100
   render_size: [64, 64]
-  replay: {capacity: 2000000.0, maxlen: 10, minlen: 10, ongoing: false, prioritize_ends: false}
-  reward_head: {act: elu, dist: mse, layers: 4, norm: none, units: 400}
-  reward_norm: {eps: 1e-08, momentum: 1.0, scale: 1.0}
+  replay:
+    {
+      capacity: 2000000.0,
+      maxlen: 10,
+      minlen: 10,
+      ongoing: false,
+      prioritize_ends: false,
+    }
+  reward_head: { act: elu, dist: mse, layers: 4, norm: none, units: 400 }
+  reward_norm: { eps: 1e-08, momentum: 1.0, scale: 1.0 }
   reward_norm_skip: true
-  rssm: {act: elu, deter: 512, deter_quant: 0, discrete: 32, ensemble: 1, hidden: 512,
-    min_std: 0.1, norm: none, std_act: sigmoid2, stoch: 32}
+  rssm:
+    {
+      act: elu,
+      deter: 512,
+      deter_quant: 0,
+      discrete: 32,
+      ensemble: 1,
+      hidden: 512,
+      min_std: 0.1,
+      norm: none,
+      std_act: sigmoid2,
+      stoch: 32,
+    }
   save_sucess_eps_filter_rate: 1.1
   slow_baseline: true
   slow_target: true
@@ -109,19 +128,17 @@ default:
   train_only_wm_steps: 0
   train_seq_buffer: 1000
   train_steps: 100
-  planner: {type: none}
-
+  planner: { type: none }
 
 vec_obs:
-  encoder: {mlp_keys: vector, cnn_keys: image}
-  decoder: {mlp_keys: vector, cnn_keys: image}
-
+  encoder: { mlp_keys: vector, cnn_keys: image }
+  decoder: { mlp_keys: vector, cnn_keys: image }
 
 low_bc:
-  bc_grad_weight: '0.2'
+  bc_grad_weight: "0.2"
 
 low_actor_rl:
-  actor_rl_weight: '0.2'
+  actor_rl_weight: "0.2"
 
 no_agent_retrain:
   bc_agent_retrain: false
@@ -133,38 +150,30 @@ high_train_every:
   train_every: 4
   train_steps: 1
 
-
-
-
-
 decay_ent:
-  actor_ent_weight : 'linear(2e-3,2e-4,1e5)'
+  actor_ent_weight: "linear(2e-3,2e-4,1e5)"
 
 decay_bc:
-  bc_grad_weight : 'linear(1e0,2e-1,1e5)'
-
-
-
+  bc_grad_weight: "linear(1e0,2e-1,1e5)"
 
 horizon_decay_ent:
-  actor_ent_weight: 'horizon_decay(2e-3,2e-5,3e4,2e-1)'
-  
+  actor_ent_weight: "horizon_decay(2e-3,2e-5,3e4,2e-1)"
+
 horizon_decay_bc:
-  bc_grad_weight : 'horizon_decay(1e0,1e-1,3e4,2e-1)'
+  bc_grad_weight: "horizon_decay(1e0,1e-1,3e4,2e-1)"
 
 horizon_decay_bc2:
-  actor_rl_weight: '0.2'
-  bc_grad_weight : 'horizon_decay(1e0,1e-1,3e4,2e-1)'
-  
+  actor_rl_weight: "0.2"
+  bc_grad_weight: "horizon_decay(1e0,1e-1,3e4,2e-1)"
 
 horizon_decay_policy_grad:
-  actor_grad_scale : 'horizon_decay(1e0,1e-1,3e4,2e-1)'
-  critic_grad_scale : 'horizon_decay(1e0,1e-1,3e4,2e-1)'
+  actor_grad_scale: "horizon_decay(1e0,1e-1,3e4,2e-1)"
+  critic_grad_scale: "horizon_decay(1e0,1e-1,3e4,2e-1)"
 
 replay50:
-  replay: {maxlen: 50, minlen: 50}
-  dataset: {batch: 16, length: 50}
-  
+  replay: { maxlen: 50, minlen: 50 }
+  dataset: { batch: 16, length: 50 }
+
 prioritize_ends:
   replay.prioritize_ends: true
 
@@ -173,15 +182,10 @@ debug:
   eval_eps: 2
 
 grad_weight1:
-  bc_grad_weight: '0.4'
-  actor_rl_weight: '0.1'
-  actor_ent_weight: '2e-03'
+  bc_grad_weight: "0.4"
+  actor_rl_weight: "0.1"
+  actor_ent_weight: "2e-03"
 
 vec_obs2:
-  encoder: {mlp_keys: vector, cnn_keys: image}
-  decoder: {mlp_keys: vector, cnn_keys: image}
-
-
-
-
-
+  encoder: { mlp_keys: vector, cnn_keys: image }
+  decoder: { mlp_keys: vector, cnn_keys: image }

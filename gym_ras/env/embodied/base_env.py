@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+
 class BaseEnv(ABC):
     def __init__(self, client):
         self.client = client
@@ -10,26 +12,25 @@ class BaseEnv(ABC):
         self.skip = False
         self.step_func_prv = None
 
-
     @abstractmethod
     def reset(self):
-        self.timestep =0
+        self.timestep = 0
         obs = self.client.reset()
-        return obs 
+        return obs
 
     @abstractmethod
-    def step(self,action):
-        self.timestep +=1
+    def step(self, action):
+        self.timestep += 1
         obs, reward, done, info = self.client.step(action)
         self.step_func_prv = obs, reward, done, info
         return obs, reward, done, info
 
     @abstractmethod
-    def render(self, mode="human"): #['human', 'rgb_array', 'mask_array']
+    def render(self, mode="human"):  # ['human', 'rgb_array', 'mask_array']
         return self.client.render(mode=mode)
-    
+
     @abstractmethod
-    def get_oracle_action(self,obs):
+    def get_oracle_action(self, obs):
         return self.client.get_oracle_action(obs)
 
     @property
@@ -53,21 +54,18 @@ class BaseEnv(ABC):
     def seed(self, seed):
         self._seed = seed
         self.client.seed = seed
-    
+
     def _init_rng(self):
         pass
+
     @property
     def unwrapped(self):
         return self
-    
+
     def __del__(self):
-    # cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
         del self.client
-    
+
     @property
     def is_wrapper(self):
         return False
-    
-
-
-        

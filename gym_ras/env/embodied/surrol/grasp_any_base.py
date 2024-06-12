@@ -6,7 +6,7 @@ import pybullet as p
 from surrol.tasks.psm_env import PsmEnv
 from surrol.utils.pybullet_utils import (
     get_link_pose,
-    reset_camera,    
+    reset_camera,
     wrap_angle
 )
 from surrol.tasks.ecm_env import EcmEnv, goal_distance
@@ -18,17 +18,19 @@ from surrol.robots.ecm import Ecm
 
 class GraspAnyBase(PsmEnv):
     POSE_TRAY = ((0.55, 0, 0.6751), (0, 0, 0))
-    WORKSPACE_LIMITS = ((0.50, 0.60), (-0.05, 0.05), (0.685, 0.745))  # reduce tip pad contact
+    WORKSPACE_LIMITS = ((0.50, 0.60), (-0.05, 0.05),
+                        (0.685, 0.745))  # reduce tip pad contact
     SCALING = 5.
     QPOS_ECM = (0, 0.6, 0.04, 0)
-    ACTION_ECM_SIZE=3
-    haptic=True
+    ACTION_ECM_SIZE = 3
+    haptic = True
 
     # TODO: grasp is sometimes not stable; check how to fix it
-    def __init__(self, render_mode=None, cid = -1):
+    def __init__(self, render_mode=None, cid=-1):
         super(GraspAnyBase, self).__init__(render_mode, cid)
         self._view_matrix = p.computeViewMatrixFromYawPitchRoll(
-            cameraTargetPosition=(-0.05 * self.SCALING, 0, 0.375 * self.SCALING),
+            cameraTargetPosition=(-0.05 * self.SCALING,
+                                  0, 0.375 * self.SCALING),
             distance=1.81 * self.SCALING,
             yaw=90,
             pitch=-30,
@@ -36,24 +38,22 @@ class GraspAnyBase(PsmEnv):
             upAxisIndex=2
         )
 
-
     def _env_setup(self, stuff_path, scaling):
         super(GraspAnyBase, self)._env_setup()
         # np.random.seed(4)  # for experiment reproduce
         self.has_object = True
         self._waypoint_goal = True
- 
+
         # camera
         if self._render_mode == 'human':
             # reset_camera(yaw=90.0, pitch=-30.0, dist=0.82 * self.SCALING,
             #              target=(-0.05 * self.SCALING, 0, 0.36 * self.SCALING))
             reset_camera(yaw=89.60, pitch=-56, dist=5.98,
-                         target=(-0.13, 0.03,-0.94))
-        self.ecm = Ecm((0.15, 0.0, 0.8524), #p.getQuaternionFromEuler((0, 30 / 180 * np.pi, 0)),
+                         target=(-0.13, 0.03, -0.94))
+        self.ecm = Ecm((0.15, 0.0, 0.8524),  # p.getQuaternionFromEuler((0, 30 / 180 * np.pi, 0)),
                        scaling=self.SCALING)
         self.ecm.reset_joint(self.QPOS_ECM)
         # p.setPhysicsEngineParameter(enableFileCaching=0,numSolverIterations=10,numSubSteps=128,contactBreakingThreshold=2)
-
 
         # robot
         workspace_limits = self.workspace_limits1
@@ -61,7 +61,8 @@ class GraspAnyBase(PsmEnv):
                workspace_limits[1][1],
                (workspace_limits[2][1] + workspace_limits[2][0]) / 2)
         orn = (0.5, 0.5, -0.5, -0.5)
-        joint_positions = self.psm1.inverse_kinematics((pos, orn), self.psm1.EEF_LINK_INDEX)
+        joint_positions = self.psm1.inverse_kinematics(
+            (pos, orn), self.psm1.EEF_LINK_INDEX)
         self.psm1.reset_joint(joint_positions)
         self.block_gripper = False
         # physical interaction
@@ -78,22 +79,24 @@ class GraspAnyBase(PsmEnv):
         yaw = (np.random.rand() - 0.5) * np.pi
         obj_id = p.loadURDF(stuff_path,
                             (workspace_limits[0].mean() + (np.random.rand() - 0.5) * 0.1,  # TODO: scaling
-                             workspace_limits[1].mean() + (np.random.rand() - 0.5) * 0.1,
+                             workspace_limits[1].mean() + \
+                             (np.random.rand() - 0.5) * 0.1,
                              workspace_limits[2][0] + 0.01),
                             p.getQuaternionFromEuler((0, 0, yaw)),
                             useFixedBase=False,
                             globalScaling=self.SCALING*scaling)
-        p.changeVisualShape(obj_id, -1, rgbaColor=[0,0.7,0,1],specularColor=(80, 80, 80)) # green
+        p.changeVisualShape(
+            obj_id, -1, rgbaColor=[0, 0.7, 0, 1], specularColor=(80, 80, 80))  # green
         self.obj_ids['rigid'].append(obj_id)  # 0
         self.obj_id, self.obj_link1 = self.obj_ids['rigid'][0], 1 if "needle" in stuff_path else -1
-
 
     def _sample_goal(self) -> np.ndarray:
         """ Samples a new goal and returns it.
         """
         workspace_limits = self.workspace_limits1
         goal = np.array([workspace_limits[0].mean() + 0.01 * np.random.randn() * self.SCALING,
-                         workspace_limits[1].mean() + 0.01 * np.random.randn() * self.SCALING,
+                         workspace_limits[1].mean() + 0.01 *
+                         np.random.randn() * self.SCALING,
                          workspace_limits[2][1] - 0.04 * self.SCALING])
         return goal.copy()
 
@@ -149,31 +152,37 @@ class GraspAnyBase(PsmEnv):
         for i, waypoint in enumerate(self._waypoints):
             if waypoint is None:
                 continue
-            delta_pos = (waypoint[:3] - obs['observation'][:3]) / 0.01 / self.SCALING
+            delta_pos = (waypoint[:3] - obs['observation']
+                         [:3]) / 0.01 / self.SCALING
             delta_yaw = (waypoint[3] - obs['observation'][5]).clip(-0.4, 0.4)
             if np.abs(delta_pos).max() > 1:
                 delta_pos /= np.abs(delta_pos).max()
             scale_factor = 0.4
             delta_pos *= scale_factor
-            action = np.array([delta_pos[0], delta_pos[1], delta_pos[2], delta_yaw, waypoint[4]])
+            action = np.array([delta_pos[0], delta_pos[1],
+                              delta_pos[2], delta_yaw, waypoint[4]])
             if np.linalg.norm(delta_pos) * 0.01 / scale_factor < 1e-4 and np.abs(delta_yaw) < 1e-2:
                 self._waypoints[i] = None
             break
 
         return action
+
     def _set_action_ecm(self, action):
         action *= 0.01 * self.SCALING
         pose_rcm = self.ecm.get_current_position()
         pose_rcm[:3, 3] += action
         pos, _ = self.ecm.pose_rcm2world(pose_rcm, 'tuple')
-        joint_positions = self.ecm.inverse_kinematics((pos, None), self.ecm.EEF_LINK_INDEX)  # do not consider orn
+        joint_positions = self.ecm.inverse_kinematics(
+            (pos, None), self.ecm.EEF_LINK_INDEX)  # do not consider orn
         self.ecm.move_joint(joint_positions[:self.ecm.DoF])
+
     def _reset_ecm_pos(self):
         self.ecm.reset_joint(self.QPOS_ECM)
 
 
 if __name__ == "__main__":
-    env = GraspAnyBase(render_mode='human')  # create one process and corresponding env
+    # create one process and corresponding env
+    env = GraspAnyBase(render_mode='human')
 
     env.test()
     env.close()

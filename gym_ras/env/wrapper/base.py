@@ -1,7 +1,7 @@
 class BaseWrapper():
-    def __init__(self, 
-            env,
-            **kwargs):
+    def __init__(self,
+                 env,
+                 **kwargs):
         self.env = env
 
     @property
@@ -15,7 +15,7 @@ class BaseWrapper():
             raise Exception("cannot find {}".format(name))
         else:
             return getattr(self.env, name)
-    
+
     def _reset_vars(self):
         pass
 
@@ -26,15 +26,15 @@ class BaseWrapper():
 
     @property
     def seed(self):
-        return self.env.seed + 10 # use incremental seed
-    
+        return self.env.seed + 10  # use incremental seed
+
     @property
     def is_wrapper(self):
         return hasattr(self.env, "env")
 
     @seed.setter
     def seed(self, seed):
-        self.unwrapped.seed = seed 
+        self.unwrapped.seed = seed
         self._init_rng(self.seed)
 
     def _init_rng(self, seed):
@@ -46,5 +46,3 @@ class BaseWrapper():
             return self
         else:
             return self.env.get_wrap_obj(class_name)
-    
-

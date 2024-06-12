@@ -2,7 +2,7 @@ default:
   seed: 0
   wrapper:
     pipeline:
-      [ 
+      [
         "ActionSmooth",
         "ImageNoise",
         "DepthProcess",
@@ -14,12 +14,7 @@ default:
         "FSM",
         "OBS",
       ]
-    ActionSmooth:
-      {
-        skip: true,
-        window: 3,
-        smooth_type: ema,
-      }
+    ActionSmooth: { skip: true, window: 3, smooth_type: ema }
     DSA:
       {
         zoom_box_obj: psm1,
@@ -35,7 +30,7 @@ default:
     ActionNoise: { noise_scale: 0.0 }
     DiscreteAction: { action_scale: 0.2 }
     TimeLimit: { max_timestep: 200 }
-    DepthProcess: {skip: true, uncert_scale: 1.0, eval: false}
+    DepthProcess: { skip: true, uncert_scale: 1.0, eval: false }
     FSM: { arg: 0 }
     OBS:
       {
@@ -49,7 +44,7 @@ default:
         dsa_out_zoom_anamaly: false,
         action_insertion_anamaly: false,
       }
-    ImageNoise: 
+    ImageNoise:
       {
         skip: true,
         pns_noise_amount: 0.05,
@@ -88,7 +83,7 @@ default:
       reward_prog_norm: -0.001
       reward_prog_abnorm_1: -0.01
       reward_prog_abnorm_2: -0.001
-      reward_prog_abnorm_3: -0.001 
+      reward_prog_abnorm_3: -0.001
       disturbance_scale: 0.0
       cam_dynamic_noise_scale: 0.0
       dr_scale_train: 1
@@ -160,7 +155,6 @@ default:
         done_cal_file: ""
         cam_mask_noisy_link: true
 
-
 #### dvrk ###
 
 dvrk_sim:
@@ -214,7 +208,6 @@ cam_rgbm:
   embodied.SurrolEnv.cam_mode: "rgbm"
   wrapper.OBS.direct_render_key: ["rgb"]
 
-
 vector2image_pixel:
   wrapper.OBS.vector2image_type: "pixel"
 
@@ -239,7 +232,6 @@ image_noise_low:
   wrapper.ImageNoise.cutout_all_amount_range: [0.9, 1.0]
   wrapper.ImageNoise.cutout_depth_amount_range: [0.9, 1.0]
 
-
 image_noise_real:
   wrapper.ImageNoise.skip: false
   wrapper.ImageNoise.cutout_all_amount_range: [0.54, 1.0]
@@ -263,8 +255,6 @@ depth_process:
 mask_except_gripper:
   embodied.SurrolEnv.mask_except_gripper: true
 
-
-
 ############## large texture ########
 large_texture:
   embodied.SurrolEnv.background_texture_dir: "./data/surgical_image/"
@@ -272,16 +262,16 @@ large_texture:
 
 dvrk_cam_setting:
   embodied.SurrolEnv:
-      {
-        cam_target_noise: 1e-2,
-        cam_distance_noise: 5e-2,
-        cam_pitch_noise: 10e0,
-        cam_roll_noise: 11e0,
-        cam_up_axis_noise: 5e0,
-        depth_remap_range_noise: 1e-2, 
-        depth_remap_center_noise: 1e-2, 
-        no_depth_link: true,
-      }
+    {
+      cam_target_noise: 1e-2,
+      cam_distance_noise: 5e-2,
+      cam_pitch_noise: 10e0,
+      cam_roll_noise: 11e0,
+      cam_up_axis_noise: 5e0,
+      depth_remap_range_noise: 1e-2,
+      depth_remap_center_noise: 1e-2,
+      no_depth_link: true,
+    }
   wrapper.DepthProcess.skip: false
   wrapper.DepthProcess.uncert_scale: 1.5
 
@@ -289,15 +279,22 @@ cam_dynamic:
   embodied.SurrolEnv.cam_dynamic_noise_scale: 0.1
 
 dvrk_init_pose_setting:
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper:
+    [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper:
+    [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle:
+    [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle:
+    [0.5, 0.7, 0.5, 0.99]
 
 dvrk_init_pose_setting_grasp_any:
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff: [-0.8, -0.8, 0.1, -0.99]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper:
+    [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper:
+    [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff:
+    [-0.8, -0.8, 0.1, -0.99]
   embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99]
   wrapper.TimeLimit: { max_timestep: 300 }
 
@@ -434,24 +431,24 @@ reward2:
   embodied.SurrolEnv.reward_prog_norm: 0
   embodied.SurrolEnv.reward_prog_abnorm_1: -0.04
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.04
-  embodied.SurrolEnv.reward_prog_abnorm_3: -0.01  
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.01
 reward3:
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.002
-  embodied.SurrolEnv.reward_prog_abnorm_3: -0.002  
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.002
 
-reward4: 
-  embodied.SurrolEnv.reward_prog_abnorm_1: -0.009 
-  embodied.SurrolEnv.reward_prog_abnorm_2: -0.001 
-  embodied.SurrolEnv.reward_prog_abnorm_3: -0.003 
+reward4:
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.009
+  embodied.SurrolEnv.reward_prog_abnorm_2: -0.001
+  embodied.SurrolEnv.reward_prog_abnorm_3: -0.003
 reward5:
-  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01 
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
   embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
   embodied.SurrolEnv.reward_done_fail: -0.1
   embodied.SurrolEnv.reward_prog_norm: -0.001
   embodied.SurrolEnv.reward_done_success: 1
 reward6:
-  embodied.SurrolEnv.reward_prog_abnorm_1: -0.05 
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.05
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.05 # sliding
   embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
   embodied.SurrolEnv.reward_done_fail: -0.001
@@ -459,7 +456,7 @@ reward6:
   embodied.SurrolEnv.reward_done_success: 1
 
 dsa_anomaly:
-   wrapper.OBS.dsa_out_zoom_anamaly: true
+  wrapper.OBS.dsa_out_zoom_anamaly: true
 
 ###### disturbance ########
 disturbance:
@@ -470,8 +467,10 @@ disturbance2:
 
 ####### workspace ##########3
 dvrk_full_ws:
-  embodied.dVRKEnv.grasp_any.psm_init_pose_low_gripper: [-0.95, -0.95, -0.95, -0.95]
-  embodied.dVRKEnv.grasp_any.psm_init_pose_high_gripper: [0.95, 0.95, 0.95, 0.95]
+  embodied.dVRKEnv.grasp_any.psm_init_pose_low_gripper:
+    [-0.95, -0.95, -0.95, -0.95]
+  embodied.dVRKEnv.grasp_any.psm_init_pose_high_gripper:
+    [0.95, 0.95, 0.95, 0.95]
 
 surrol_grasp_any:
   ## dvrk_cam_setting
@@ -486,10 +485,14 @@ surrol_grasp_any:
   wrapper.DepthProcess.skip: false
   wrapper.DepthProcess.uncert_scale: 1.5
   ## dvrk_init_pose_setting
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper:
+    [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper:
+    [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle:
+    [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle:
+    [0.5, 0.7, 0.5, 0.99]
   ## dsa_zoom_high
   wrapper.DSA.zoom_box_fix_length_ratio: 0.3
   ## grasp_any
@@ -505,7 +508,6 @@ surrol_grasp_any:
   embodied.SurrolEnv.cam_dynamic_noise_scale: 0.1
   # dsa_3:
   wrapper.DSA.encode_type: general_simple3
-
 
 dvrk_grasp_any:
   # dvrk_real_dsa
@@ -527,8 +529,6 @@ insertion_anamaly:
 vector2image_square:
   wrapper.OBS.vector2image_type: "square"
 
-
-
 gas_surrol:
   ## dvrk_cam_setting
   embodied.SurrolEnv.cam_target_noise: 1e-2
@@ -542,10 +542,14 @@ gas_surrol:
   wrapper.DepthProcess.skip: false
   wrapper.DepthProcess.uncert_scale: 1.5
   ## dvrk_init_pose_setting
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle: [-0.5, -0.7, 0.1, -0.99]
-  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle: [0.5, 0.7, 0.5, 0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_gripper:
+    [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_gripper:
+    [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_low_needle:
+    [-0.5, -0.7, 0.1, -0.99]
+  embodied.SurrolEnv.needle_pick.init_pose_ratio_high_needle:
+    [0.5, 0.7, 0.5, 0.99]
   ## dsa_zoom_high
   wrapper.DSA.zoom_box_fix_length_ratio: 0.3
   ## grasp_any
@@ -564,16 +568,19 @@ gas_surrol:
   # dsa_anomaly:
   wrapper.OBS.dsa_out_zoom_anamaly: true
   # reward5:
-  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01 
+  embodied.SurrolEnv.reward_prog_abnorm_1: -0.01
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
   embodied.SurrolEnv.reward_prog_abnorm_3: -0.005 # gripper toggling | dsa out
   embodied.SurrolEnv.reward_done_fail: -0.1
   embodied.SurrolEnv.reward_prog_norm: -0.001
   embodied.SurrolEnv.reward_done_success: 1
   # dvrk_init_pose_setting_grasp_any:
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper: [-0.9, -0.9, -0.8, -0.9]
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper: [0.9, 0.9, 0.9, 0.9]
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff: [-0.8, -0.8, 0.1, -0.99]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_gripper:
+    [-0.9, -0.9, -0.8, -0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper:
+    [0.9, 0.9, 0.9, 0.9]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff:
+    [-0.8, -0.8, 0.1, -0.99]
   embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99]
   wrapper.TimeLimit: { max_timestep: 300 }
   # disturbance2:
@@ -585,7 +592,7 @@ gas_surrol:
 
 raw:
   wrapper.DSA.encode_type: raw
-no_depth_estimation: 
+no_depth_estimation:
   wrapper.DepthProcess.skip: true
 
 no_clutch:
@@ -607,7 +614,7 @@ no_clutch:
 #   # robot action noise
 #   wrapper.ActionNoise.noise_scale: 0.00
 
-no_dr: 
+no_dr:
   embodied.SurrolEnv.dr_scale_train: 0
 
 no_cam_noisy_mask:

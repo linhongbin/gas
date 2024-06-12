@@ -2,11 +2,12 @@ from gym_ras.env.wrapper.base import BaseWrapper
 import numpy as np
 from gym_ras.tool.common import ema
 
+
 class ActionSmooth(BaseWrapper):
     def __init__(self, env,
                  window=3,
                  smooth_type='ema',
-                 skip=True, 
+                 skip=True,
                  **kwargs):
         super().__init__(env)
         self._reset_var()
@@ -20,11 +21,11 @@ class ActionSmooth(BaseWrapper):
             self._reset_var()
         return obs
 
-
     def step(self, action):
         if not self._skip:
             self._action_list.append(action[:3].copy())
-            self._action_list = self._action_list[max(len(self._action_list)-self._window,0):]
+            self._action_list = self._action_list[max(
+                len(self._action_list)-self._window, 0):]
             if self._smooth_type == 'ema':
                 _action = ema(self._action_list, self._window)[-1]
             else:
