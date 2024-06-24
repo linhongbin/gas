@@ -146,8 +146,8 @@ default:
         psm_max_step_rot: 20.0
         cam_image_height: 600
         cam_image_width: 600
-        cam_depth_remap_center: -1.0
-        cam_depth_remap_range: -1.0
+        cam_depth_remap_center: 0.3
+        cam_depth_remap_range: 0.1
         dvrk_cal_file: ""
         cam_segment_tool: ""
         cam_segment_model_dir: ""
@@ -513,8 +513,8 @@ dvrk_grasp_any:
   # dvrk_real_dsa
   embodied_name: dVRKEnv
   embodied.dVRKEnv.grasp_any.dvrk_cal_file: "./data/dvrk_cal/dvrk_cal.yaml"
-  embodied.dVRKEnv.grasp_any.cam_cal_file: "./data/dvrk_cal/cam_cal.yaml"
-  embodied.dVRKEnv.grasp_any.done_cal_file: "./data/dvrk_cal/done_cal.yaml"
+  # embodied.dVRKEnv.grasp_any.cam_cal_file: "./data/dvrk_cal/cam_cal.yaml"
+  # embodied.dVRKEnv.grasp_any.done_cal_file: "./data/dvrk_cal/done_cal.yaml"
   wrapper.DepthProcess.eval: true
   # color_seg
   embodied.dVRKEnv.grasp_any.cam_segment_tool: "track_any"

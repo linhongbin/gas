@@ -4,7 +4,7 @@ setup(name='gym_ras',
       version='1.0',
     install_requires=[
         'gym<=0.24', 
-        'opencv-python',
+        'opencv-python<4.10',
         'ruamel.yaml<=0.17',
         'tqdm',
         'Pillow',

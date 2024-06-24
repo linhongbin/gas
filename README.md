@@ -7,7 +7,7 @@ Implementation of the "Grasp Anything for Surgery" (GAS).
 
 ## 2.1. Download
 ```sh
-git clone https://github.com/linhongbin/gas.git
+git clone -b main --single-branch https://github.com/linhongbin/gas.git
 cd gas
 git submodule update --init --recursive
 ```

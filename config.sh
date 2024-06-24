@@ -1,2 +1,2 @@
-ANACONDA_PATH="$HOME/miniconda3"
+ANACONDA_PATH="$HOME/anaconda3"
 ENV_NAME=gas
