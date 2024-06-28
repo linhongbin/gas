@@ -76,7 +76,8 @@ class RS435_ROS_Engine():
         # img["depth"][img["depth"]>self._depth_thres_high] = 0
         # img["depth"][img["depth"]<self._depth_thres_low] = 0
         # img["depth"] = np.uint8(img["depth"])
-        img["mask"] = self._data["mask"]
+        if self._segmentor is not None:
+            img["mask"] = self._data["mask"]
 
         return img
 

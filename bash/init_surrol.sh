@@ -1,4 +1,4 @@
-source config.sh
+source ./config/config.sh
 source $ANACONDA_PATH/bin/activate
 conda activate $ENV_NAME
 alias python=$ANACONDA_PATH/envs/$ENV_NAME/bin/python3.9

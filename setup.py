@@ -13,5 +13,6 @@ setup(name='gym_ras',
         'pynput',
         'pybullet==3.0.9',
         'numpy<=1.23',
+        'setuptools<=59.5.0',
         ], 
       packages=find_packages())

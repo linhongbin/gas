@@ -6,9 +6,11 @@ import cv2
 import numpy as np
 import os
 import sys
-sys.path.append(sys.path[0]+"/ext/Track-Anything")
-sys.path.append(sys.path[0]+"/ext/Track-Anything/tracker")
-sys.path.append(sys.path[0]+"/ext/Track-Anything/tracker/model")
+from pathlib import Path
+root_path = Path(__file__).parent.parent.parent
+sys.path.append(str(root_path)+"/ext/Track-Anything")
+sys.path.append(str(root_path)+"/ext/Track-Anything/tracker")
+sys.path.append(str(root_path)+"/ext/Track-Anything/tracker/model")
 from track_anything import TrackingAnything
 from track_anything import parse_augment
 import requests
@@ -709,7 +711,7 @@ class Tracker:
             # set example
             gr.Markdown("##  Examples")
             gr.Examples(
-                examples=[os.path.join(os.path.dirname(__file__), "./ext/Track-Anything/test_sample/", test_sample) for test_sample in ["test-sample8.mp4","test-sample4.mp4", \
+                examples=[os.path.join(str(root_path), "ext/Track-Anything/test_sample/", test_sample) for test_sample in ["test-sample8.mp4","test-sample4.mp4", \
                                                                                                                     "test-sample2.mp4","test-sample13.mp4"]],
                 fn=self.run_example,
                 inputs=[
