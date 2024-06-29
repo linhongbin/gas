@@ -148,7 +148,7 @@ class GraspAny(gym.Env):
         _psm = self._arms[self._arm_names[0]]
         _psm.reset_pose()
         self._cam_device._segment.reset()
-        time.sleep(0.6)
+        time.sleep(1)
         _psm.move_gripper_init_pose()
         return _psm.get_obs()
 

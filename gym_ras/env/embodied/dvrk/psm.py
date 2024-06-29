@@ -1,7 +1,7 @@
 
 from dvrk import psm
 from gym_ras.tool.common import TxT, invT, getT, T2Quat, scale_arr, M2Euler, wrapAngle, Euler2M, printT, Quat2M, M2Quat
-from gym_ras.tool.kdl_tool import Frame2T, Quaternion2Frame
+from gym_ras.tool.kdl_tool import Frame2T, Quaternion2Frame, gen_interpolate_frames, T2Frame
 import numpy as np
 import gym
 
@@ -53,7 +53,22 @@ class SinglePSM():
     def init_rng(self, seed):
         gripper_pose_seed = np.uint32(seed)
         self._gripper_pose_rng = np.random.RandomState(gripper_pose_seed)
+    
+    def moveT(self, T, interp_num=-1):
+        T_local = TxT([invT(self._world2base), T])
+        self.moveT_local(T_local, interp_num)
 
+    def moveT_local(self, T, interp_num=-1):
+        T_origin = self.tip_pose_local
+        frame1 = T2Frame(T_origin)
+        frame2 = T2Frame(T)
+        if interp_num>0:
+            frames = gen_interpolate_frames(frame1, frame2,num=interp_num)
+            for i, f in enumerate(frames):
+                self._psm.move_cp(f).wait()
+        else:
+            self._psm.move_cp(frame2).wait()
+        
     def move_gripper_init_pose(self):
         pos_rel = self._gripper_pose_rng.uniform(
             self._init_pose_low_gripper, self._init_pose_high_gripper)
@@ -73,9 +88,11 @@ class SinglePSM():
         pos = pose[:3]
         T = getT(pos_list=pos, rot_list=quat,)
         action_rcm = TxT([invT(self._world2base), T])
-        pos, quat = T2Quat(action_rcm)
-        frame = Quaternion2Frame(*pos, *quat)
-        self._psm.move_cp(frame).wait()
+        # pos, quat = T2Quat(action_rcm)
+        # frame = Quaternion2Frame(*pos, *quat)
+
+        self.moveT_local(action_rcm, interp_num=10)
+        # self._psm.move_cp(frame).wait()
 
     def reset_pose(self):
         self._psm.jaw.move_jp(np.deg2rad(self._open_gripper_deg)).wait()
@@ -94,6 +111,8 @@ class SinglePSM():
         obs["robot_prio"] = tip_pos
         obs["gripper_state"] = gripper_state
         return obs
+    def close_gripper(self,):
+        self._psm.jaw.close().wait()
 
     @property
     def workspace_limit(self):
@@ -134,7 +153,7 @@ class SinglePSM():
         T = Frame2T(self._psm.setpoint_cp())
         # printT(T, prefix_string="tip_pose_local")
         return T
-
+    
     def _set_action(self, action: np.ndarray):
         """
         delta_position (3), delta_theta (1) and open/close the gripper (1)
@@ -172,7 +191,8 @@ class SinglePSM():
         pos = pos.tolist()
         goal = Quaternion2Frame(*pos, *quat)
 
-        self._psm.move_cp(goal).wait()
+        # self._psm.move_cp(goal).wait()
+        self.moveT_local(Frame2T(goal), interp_num=3)
 
         # jaw
         if action[4] < 0:
