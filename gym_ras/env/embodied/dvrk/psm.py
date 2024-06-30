@@ -113,6 +113,8 @@ class SinglePSM():
         return obs
     def close_gripper(self,):
         self._psm.jaw.close().wait()
+    def open_gripper(self,):
+        self._psm.jaw.move_jp(np.deg2rad(self._open_gripper_deg)).wait()
 
     @property
     def workspace_limit(self):

@@ -1,7 +1,7 @@
 import argparse
 import dvrk
 from gym_ras.tool.ds_util import DS_Controller
-from gym_ras.tool.kdl_tool import Frame2T
+from gym_ras.tool.kdl_tool import Frame2T, T2Frame
 import numpy as np
 import yaml
 from pathlib import Path
@@ -14,6 +14,13 @@ args = parser.parse_args()
 
 assert args.arm in ["PSM1", "PSM2"]
 arm1 = dvrk.psm(args.arm)
+f = arm1.measured_cp()
+T1 = Frame2T(f)
+T = np.zeros((4,4), dtype=np.float)
+T[0,0] = -1; T[1,1] = 1; T[2,2] = -1; T[3,3] = 1;
+T1[0:3,0:3] = T[0:3,0:3]
+arm1.move_cp(T2Frame(T1)).wait()
+arm1.jaw.close().wait()
 in_device = DS_Controller()
 
 def get_pose():
