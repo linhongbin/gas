@@ -143,7 +143,7 @@ User can direclty use our pretrained models for evaluation for simulation and re
 Please refer to [eval_dvrk.md](./doc/eval_dvrk.md) for the evaluation in real robot.
 
 
-# Citation
+# 4. Citation
 ```
  @article{lin2024world,
   title={World Models for General Surgical Grasping},
@@ -152,7 +152,7 @@ Please refer to [eval_dvrk.md](./doc/eval_dvrk.md) for the evaluation in real ro
   year={2024}
 }
 ```
-# 4. Acknowledgement
+# 5. Acknowledgement
 
 This work integrates several amazing works: [dreamerv2](https://github.com/linhongbin-ws/dreamerv2.git), [stable-baselines3](https://github.com/linhongbin-ws/stable-baselines3), [Track-Anything](https://github.com/linhongbin-ws/Track-Anything.git), [SurRoL](https://github.com/linhongbin-ws/SurRoL.git), [dVRK](https://github.com/jhu-dvrk/sawIntuitiveResearchKit), [ds4drv](https://github.com/naoki-mizuno/ds4drv). Thanks for their efforts.
 For any issue or question, welcome to open an issue in the github.
