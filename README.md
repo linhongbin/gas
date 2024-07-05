@@ -48,7 +48,9 @@ git submodule update --init --recursive
     python ./run/env_play.py --env-tag gas_surrol # without pybullet GUI
     python ./run/env_play.py --env-tag gas_surrol gui # or using pybullet GUI to better visualize
     ```
+
     keyboard mapping:
+    
     `w` `s` `a` `d`: moving gripper forward, backward, left, and right
 
     `i` `k` `j` `l`: moving gripper upward, downward, rotating clockwise and counter-clockwise
@@ -116,7 +118,9 @@ User can direclty use our pretrained models for evaluation for simulation and re
     source bash/init_surrol.sh
     python ./run/rl_train.py --reload-dir ./log/2024_01_21-13_57_13@ras-gas_surrol@dreamerv2-gas@seed1/ --reload-envtag gas_surrol --online-eval --visualize --vis-tag obs rgb mask --online-eps 20 --save-prefix GAS
     ```
+
     arguments:
+
     `reload-dir`: the path to your checkpoint directory
 
     `--reload-envtag` the environtment tag, which is required to sync that you use in training
