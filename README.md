@@ -2,10 +2,9 @@
 
 Official implementation of the "Grasp Anything for Surgery" (GAS).
 [[project website](http://hongbinlin.com/gas/)] [[paper](https://arxiv.org/pdf/2405.17940)]
-<p align="left">
-  <img src="./doc/1.gif" alt="Snow" style="width:40%">
-  <img src="./doc/2.gif" alt="Forest" style="width:40%">
-</p>
+
+| ![](./doc/1.gif) | ![](./doc/2.gif) |
+| :----------------------: | :-----------------------: |
 
 # 2. Install
 
@@ -49,16 +48,23 @@ git submodule update --init --recursive
     python ./run/env_play.py --env-tag gas_surrol # without pybullet GUI
     python ./run/env_play.py --env-tag gas_surrol gui # or using pybullet GUI to better visualize
     ```
+
     keyboard mapping:
+    
     `w` `s` `a` `d`: moving gripper forward, backward, left, and right
+
     `i` `k` `j` `l`: moving gripper upward, downward, rotating clockwise and counter-clockwise
+
     `n`: toggle the gripper jaw
+
     `q`: exit the program
- <br>
+
+
   - Play with script demonstration 
     ```sh
     python ./run/env_play.py --env-tag gas_surrol --oracle script
     ```
+
   - Play with random action 
     ```sh
     python ./run/env_play.py --env-tag gas_surrol --action random
@@ -112,13 +118,20 @@ User can direclty use our pretrained models for evaluation for simulation and re
     source bash/init_surrol.sh
     python ./run/rl_train.py --reload-dir ./log/2024_01_21-13_57_13@ras-gas_surrol@dreamerv2-gas@seed1/ --reload-envtag gas_surrol --online-eval --visualize --vis-tag obs rgb mask --online-eps 20 --save-prefix GAS
     ```
+
     arguments:
+
     `reload-dir`: the path to your checkpoint directory
+
     `--reload-envtag` the environtment tag, which is required to sync that you use in training
+
     `--vis-tag` a list of cv2 show images, the list: [rgb, depth, mask, dsa]
+
     `--online-eps` episodes for evaluation
+
     `--save-prefix` prefix for save result file 
-    <br>
+
+
 - Run other methods
     ```sh
     python ./run/rl_train.py --reload-dir ./data/agent/GAS-NoDR/2024_01_26-15_23_06@ras-gas_surrol-no_dr@dreamerv2-gas@seed1/ --reload-envtag gas_surrol no_dr --online-eval --visualize --vis-tag obs rgb mask --online-eps 20 --save-prefix GAS-NoDR # GAS-NoDR
@@ -130,7 +143,7 @@ User can direclty use our pretrained models for evaluation for simulation and re
 Please refer to [eval_dvrk.md](./doc/eval_dvrk.md) for the evaluation in real robot.
 
 
-# Citation
+# 4. Citation
 ```
  @article{lin2024world,
   title={World Models for General Surgical Grasping},
@@ -139,7 +152,7 @@ Please refer to [eval_dvrk.md](./doc/eval_dvrk.md) for the evaluation in real ro
   year={2024}
 }
 ```
-# 4. Acknowledgement
+# 5. Acknowledgement
 
 This work integrates several amazing works: [dreamerv2](https://github.com/linhongbin-ws/dreamerv2.git), [stable-baselines3](https://github.com/linhongbin-ws/stable-baselines3), [Track-Anything](https://github.com/linhongbin-ws/Track-Anything.git), [SurRoL](https://github.com/linhongbin-ws/SurRoL.git), [dVRK](https://github.com/jhu-dvrk/sawIntuitiveResearchKit), [ds4drv](https://github.com/naoki-mizuno/ds4drv). Thanks for their efforts.
 For any issue or question, welcome to open an issue in the github.
