@@ -6,6 +6,10 @@ Official implementation of the "Grasp Anything for Surgery" (GAS).
   <img src="./doc/1.gif" alt="Snow" style="width:40%">
   <img src="./doc/2.gif" alt="Forest" style="width:40%">
 </p>
+<img src="./doc/1.gif" style="width:40%"/> <img src="./doc/2.gif" style="width:40%"/> 
+
+| ![](./doc/1.gif) | ![](./doc/1.gif) |
+| :----------------------: | :-----------------------: |
 
 # 2. Install
 
