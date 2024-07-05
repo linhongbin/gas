@@ -3,7 +3,7 @@
 Official implementation of the "Grasp Anything for Surgery" (GAS).
 [[project website](http://hongbinlin.com/gas/)] [[paper](https://arxiv.org/pdf/2405.17940)]
 
-| ![](./doc/1.gif) | ![](./doc/1.gif) |
+| ![](./doc/1.gif) | ![](./doc/2.gif) |
 | :----------------------: | :-----------------------: |
 
 # 2. Install
