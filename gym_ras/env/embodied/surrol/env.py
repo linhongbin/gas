@@ -45,6 +45,7 @@ class SurrolEnv(BaseEnv):
                  no_depth_noise=0.9,
                  dr_scale_train=1,
                  dr_scale_eval=1,
+                 stuff_dist=False,
                  **kwargs,
                  ):
         self._cam_width = cam_width
@@ -54,6 +55,7 @@ class SurrolEnv(BaseEnv):
         self._mask_obj = ["psm1", "stuff"]
         self._dr_scale = {"train": dr_scale_train, "eval": dr_scale_eval, }
         self._mode = "train"
+        self._stuff_dist = stuff_dist
         if task == "needle_pick":
             from gym_ras.env.embodied.surrol.needle_pick import NeedlePickMod
             # print(kwargs)
@@ -247,7 +249,7 @@ class SurrolEnv(BaseEnv):
             _str = self._get_fsm_prog_abnorm(gripper_toggle, _is_out)
             if _str != "":
                 info["fsm"] = _str
-            if not self.client._is_grasp_obj():
+            if not self.client._is_grasp_obj() and self._stuff_dist:
                 self._disturbance_on_stuff()
 
             self.step_func_prv = obs, reward, done, info

@@ -38,7 +38,7 @@ class GraspAnyBase(PsmEnv):
             upAxisIndex=2
         )
 
-    def _env_setup(self, stuff_path, scaling):
+    def _env_setup(self, stuff_path, scaling, stuff_floating):
         super(GraspAnyBase, self)._env_setup()
         # np.random.seed(4)  # for experiment reproduce
         self.has_object = True
@@ -69,22 +69,29 @@ class GraspAnyBase(PsmEnv):
         self._contact_approx = False
 
         # tray pad
-        obj_id = p.loadURDF(os.path.join(ASSET_DIR_PATH, 'tray/tray_pad.urdf'),
-                            np.array(self.POSE_TRAY[0]) * self.SCALING,
-                            p.getQuaternionFromEuler(self.POSE_TRAY[1]),
-                            globalScaling=self.SCALING)
+        obj_id = p.loadURDF(
+            os.path.join(ASSET_DIR_PATH, "tray/tray_pad2.urdf"),
+            np.array(self.POSE_TRAY[0]) * self.SCALING,
+            p.getQuaternionFromEuler(self.POSE_TRAY[1]),
+            useFixedBase=1,
+            globalScaling=self.SCALING,
+        )
         self.obj_ids['fixed'].append(obj_id)  # 1
 
         # needle
         yaw = (np.random.rand() - 0.5) * np.pi
-        obj_id = p.loadURDF(stuff_path,
-                            (workspace_limits[0].mean() + (np.random.rand() - 0.5) * 0.1,  # TODO: scaling
-                             workspace_limits[1].mean() + \
-                             (np.random.rand() - 0.5) * 0.1,
-                             workspace_limits[2][0] + 0.01),
-                            p.getQuaternionFromEuler((0, 0, yaw)),
-                            useFixedBase=False,
-                            globalScaling=self.SCALING*scaling)
+        obj_id = p.loadURDF(
+            stuff_path,
+            (
+                workspace_limits[0].mean()
+                + (np.random.rand() - 0.5) * 0.1,  # TODO: scaling
+                workspace_limits[1].mean() + (np.random.rand() - 0.5) * 0.1,
+                workspace_limits[2][0] + 0.01,
+            ),
+            p.getQuaternionFromEuler((0, 0, yaw)),
+            useFixedBase=False,
+            globalScaling=self.SCALING * scaling,
+        )
         p.changeVisualShape(
             obj_id, -1, rgbaColor=[0, 0.7, 0, 1], specularColor=(80, 80, 80))  # green
         self.obj_ids['rigid'].append(obj_id)  # 0
