@@ -90,7 +90,9 @@ in_device.led_on(g=0.8,r=0.8)
 print("move to reset pose")
 cmd = in_device.get_discrete_cmd()
 qs = arm1.measured_jp()
-Ts['reset_q'] = qs[:7].tolist()
+Ts['reset_q'] = np.rad2deg(qs[:7])
+Ts['reset_q'][2] = qs[2]
+Ts['reset_q'] = Ts['reset_q'].tolist()
 in_device.led_off()
 
 # ratio_func = lambda x,y, rate: x*(1-rate)+y*rate
