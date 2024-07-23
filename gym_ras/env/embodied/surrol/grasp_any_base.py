@@ -38,7 +38,7 @@ class GraspAnyBase(PsmEnv):
             upAxisIndex=2
         )
 
-    def _env_setup(self, stuff_path, scaling, stuff_floating):
+    def _env_setup(self, stuff_path, scaling, on_plane):
         super(GraspAnyBase, self)._env_setup()
         # np.random.seed(4)  # for experiment reproduce
         self.has_object = True
@@ -50,9 +50,9 @@ class GraspAnyBase(PsmEnv):
             #              target=(-0.05 * self.SCALING, 0, 0.36 * self.SCALING))
             reset_camera(yaw=89.60, pitch=-56, dist=5.98,
                          target=(-0.13, 0.03, -0.94))
-        self.ecm = Ecm((0.15, 0.0, 0.8524),  # p.getQuaternionFromEuler((0, 30 / 180 * np.pi, 0)),
-                       scaling=self.SCALING)
-        self.ecm.reset_joint(self.QPOS_ECM)
+        # self.ecm = Ecm((0.15, 0.0, 0.8524),  # p.getQuaternionFromEuler((0, 30 / 180 * np.pi, 0)),
+        #                scaling=self.SCALING)
+        # self.ecm.reset_joint(self.QPOS_ECM)
         # p.setPhysicsEngineParameter(enableFileCaching=0,numSolverIterations=10,numSubSteps=128,contactBreakingThreshold=2)
 
         # robot
@@ -70,7 +70,7 @@ class GraspAnyBase(PsmEnv):
 
         # tray pad
         obj_id = p.loadURDF(
-            os.path.join(ASSET_DIR_PATH, "tray/tray_pad2.urdf"),
+            os.path.join(ASSET_DIR_PATH, "tray/tray_pad.urdf" if on_plane else "tray/tray_pad2.urdf"),
             np.array(self.POSE_TRAY[0]) * self.SCALING,
             p.getQuaternionFromEuler(self.POSE_TRAY[1]),
             useFixedBase=1,
@@ -174,17 +174,17 @@ class GraspAnyBase(PsmEnv):
 
         return action
 
-    def _set_action_ecm(self, action):
-        action *= 0.01 * self.SCALING
-        pose_rcm = self.ecm.get_current_position()
-        pose_rcm[:3, 3] += action
-        pos, _ = self.ecm.pose_rcm2world(pose_rcm, 'tuple')
-        joint_positions = self.ecm.inverse_kinematics(
-            (pos, None), self.ecm.EEF_LINK_INDEX)  # do not consider orn
-        self.ecm.move_joint(joint_positions[:self.ecm.DoF])
+    # def _set_action_ecm(self, action):
+    #     action *= 0.01 * self.SCALING
+    #     pose_rcm = self.ecm.get_current_position()
+    #     pose_rcm[:3, 3] += action
+    #     pos, _ = self.ecm.pose_rcm2world(pose_rcm, 'tuple')
+    #     joint_positions = self.ecm.inverse_kinematics(
+    #         (pos, None), self.ecm.EEF_LINK_INDEX)  # do not consider orn
+    #     self.ecm.move_joint(joint_positions[:self.ecm.DoF])
 
-    def _reset_ecm_pos(self):
-        self.ecm.reset_joint(self.QPOS_ECM)
+    # def _reset_ecm_pos(self):
+    #     self.ecm.reset_joint(self.QPOS_ECM)
 
 
 if __name__ == "__main__":

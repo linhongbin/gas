@@ -130,6 +130,8 @@ default:
         random_obj_vis: false
         depth_distance: 0.3
         on_plane: true
+        oracle_pos_thres: 1e-3
+        oracle_rot_thres: 3e-1
     dVRKEnv:
       grasp_any:
         arm_names: ["PSM1"]
@@ -593,6 +595,8 @@ gas_surrol:
 
 grasp_standing_needle:
   embodied.SurrolEnv.grasp_any.on_plane: false
+  embodied.SurrolEnv.grasp_any.oracle_pos_thres: 15e-4
+  wrapper.ActionNoise.noise_scale: 0.01
 raw:
   wrapper.DSA.encode_type: raw
 no_depth_estimation:

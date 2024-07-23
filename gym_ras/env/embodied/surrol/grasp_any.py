@@ -37,6 +37,7 @@ class GraspAny(GraspAnyBase):
     ): 
         if not on_plane:
             _z_level = 0.035
+            # _z_level = 0.0
             self.WORKSPACE_LIMITS1 = (
                 (0.50, 0.60),
                 (-0.05 - 0.02, 0.05 + 0.02),
@@ -104,7 +105,7 @@ class GraspAny(GraspAnyBase):
 
         # print("urdf scaling:",scaling, "dir: ",_dir)
 
-        super()._env_setup(stuff_path=str(_dir), scaling=scaling if self._on_plane else 1, stuff_floating=False)
+        super()._env_setup(stuff_path=str(_dir), scaling=scaling if self._on_plane else 1, on_plane=self._on_plane)
         # workspace_limits = np.asarray(self.WORKSPACE_LIMITS1) \
         #                    + np.array([0., 0., 0.0102]).reshape((3, 1))  # tip-eef offset with collision margin
         # workspace_limits *= self.SCALING  # use scaling for more stable collistion simulation
@@ -284,21 +285,29 @@ class GraspAny(GraspAnyBase):
         return pos_obj[2]
 
     def _fsm(self):
-        obs = self._get_robot_state(idx=0)  # for psm1
-        tip = obs[2]
-        if (
-            self._is_grasp_obj()
-            and (tip - self.workspace_limits1[2][0]) > self._done_z_thres
-        ):
-            return "done_success"
-        stuff_z = self._get_stuff_z()
-        # prevent stuff is lifted without grasping or grasping unrealisticly
-        if (not self._is_grasp_obj()) and (
-            stuff_z - self._init_stuff_z
-        ) > self.SCALING * 0.015:
-            return "done_fail"
-        return "prog_norm"
+        if self._on_plane:
+            obs = self._get_robot_state(idx=0)  # for psm1
+            tip = obs[2]
+            if (
+                self._is_grasp_obj()
+                and (tip - self.workspace_limits1[2][0]) > self._done_z_thres
+            ):
+                return "done_success"
+            stuff_z = self._get_stuff_z()
+            # prevent stuff is lifted without grasping or grasping unrealisticly
+            if (not self._is_grasp_obj()) and (
+                stuff_z - self._init_stuff_z
+            ) > self.SCALING * 0.015:
+                return "done_fail"
 
+            return "prog_norm"
+        else:
+            if self._init_stuff_constraint is not None and self._contact_constraint is None:
+                return "prog_norm"
+            elif self._init_stuff_constraint is None and self._contact_constraint is not None:
+                return "done_success"
+            else:
+                return "done_fail"
     def _sample_goal(self) -> np.ndarray:
         """Samples a new goal and returns it."""
         scale = 0 if self._fix_goal else self.SCALING
