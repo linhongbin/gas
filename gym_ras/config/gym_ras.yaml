@@ -3,14 +3,13 @@ default:
   wrapper:
     pipeline:
       [
-        "ActionSmooth",
+        "ActionNoise",
         "ImageNoise",
+        "TimeLimit",
+        "DiscreteAction",
         "DepthProcess",
         "DSA",
         "VirtualClutch",
-        "ActionNoise",
-        "DiscreteAction",
-        "TimeLimit",
         "FSM",
         "OBS",
       ]

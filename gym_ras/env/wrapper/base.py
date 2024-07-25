@@ -38,7 +38,7 @@ class BaseWrapper():
         self._init_rng(self.seed)
 
     def _init_rng(self, seed):
-        if self.env.is_wrapper:
+        if self.is_wrapper:
             self.env._init_rng(self.env.seed)
 
     def get_wrap_obj(self, class_name):

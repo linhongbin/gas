@@ -238,5 +238,5 @@ class ImageNoise(BaseWrapper):
         image_noise_seed = np.uint32(seed)
         print("image_noise_seed:", image_noise_seed)
         self._image_noise_rng = np.random.RandomState(image_noise_seed)
-        if self.env.is_wrapper:
+        if self.is_wrapper:
             self.env._init_rng(self.env.seed)

@@ -33,5 +33,5 @@ class ActionNoise(BaseWrapper):
         action_noise_seed = np.uint32(seed)
         print("action_noise_seed:", action_noise_seed)
         self._action_noise_rng = np.random.RandomState(action_noise_seed)
-        if self.env.is_wrapper:
+        if self.is_wrapper:
             self.env._init_rng(self.env.seed)

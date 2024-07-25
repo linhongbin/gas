@@ -32,6 +32,13 @@ class DSA(BaseWrapper):
         self._dsa_key = dsa_key
         self._reset_vars()
 
+    def step(self, action):
+        obs, reward, done, info = self.env.step(action)
+        if self.is_out_dsa_zoom and info["fsm"] != "done_success":
+            info["fsm"] = "prog_abnorm_3" # cover the fsm state
+
+        return obs, reward, done, info
+
     # def _mask_or(self, mask, ids):
     #     x = None
     #     for _id in ids:

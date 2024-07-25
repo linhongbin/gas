@@ -50,12 +50,12 @@ class OBS(BaseWrapper):
                 reward = self.env.reward_dict[_str]
                 info["fsm"] = _str
         obs = self._get_obs(obs)
-        if self._dsa_out_zoom_anamaly:
-            if self.env.is_out_dsa_zoom and info["fsm"] != "done_success":
-                _str = "prog_abnorm_3"
-                obs['fsm_state'] = self.env.fsm_states.index(_str)
-                reward = self.env.reward_dict[_str]
-                info["fsm"] = _str
+        # if self._dsa_out_zoom_anamaly:
+        #     if self.env.is_out_dsa_zoom and info["fsm"] != "done_success":
+        #         _str = "prog_abnorm_3"
+        #         obs['fsm_state'] = self.env.fsm_states.index(_str)
+        #         reward = self.env.reward_dict[_str]
+        #         info["fsm"] = _str
 
         return obs, reward, done, info
 
