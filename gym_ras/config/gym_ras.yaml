@@ -24,13 +24,14 @@ default:
         encoding_id_psm1: 130,
         encoding_id_zoom_box: 30,
         zoom_movement_type: continuous,
+        dense_reward: false,
       }
     VirtualClutch: { start: 6 }
     ActionNoise: { noise_scale: 0.0 }
     DiscreteAction: { action_scale: 0.2 }
     TimeLimit: { max_timestep: 200 }
     DepthProcess: { skip: true, uncert_scale: 1.0, eval: false }
-    FSM: { arg: 0 }
+    FSM: { arg: 0 , ensure_norm_reward: false,  dsa_out_zoom_anamaly: false,}
     OBS:
       {
         image_obs_key: ["dsa"],
@@ -40,8 +41,8 @@ default:
         is_vector2image: true,
         image_resize: [64, 64],
         vector2image_type: "row",
-        dsa_out_zoom_anamaly: false,
         action_insertion_anamaly: false,
+        cv_interpolate: "area"
       }
     ImageNoise:
       {
@@ -396,6 +397,7 @@ dsa_3:
 dsa_iros2023:
   wrapper.DSA.encode_type: IROS2023
   wrapper.DSA.zoom_box_obj: needle
+
 dsa_discrete:
   wrapper.DSA.zoom_movement_type: discrete
 
@@ -458,7 +460,7 @@ reward6:
   embodied.SurrolEnv.reward_done_success: 1
 
 dsa_anomaly:
-  wrapper.OBS.dsa_out_zoom_anamaly: true
+  wrapper.FSM.dsa_out_zoom_anamaly: true
 
 ###### disturbance ########
 disturbance:
@@ -568,7 +570,7 @@ gas_surrol:
   # dsa_3:
   wrapper.DSA.encode_type: general_simple3
   # dsa_anomaly:
-  wrapper.OBS.dsa_out_zoom_anamaly: true
+  wrapper.FSM.dsa_out_zoom_anamaly: true
   # reward5:
   embodied.SurrolEnv.reward_prog_abnorm_1: -0.01
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
@@ -631,3 +633,11 @@ image_noise_on:
 
 action_noise_on:
   wrapper.ActionNoise.noise_scale: 0.04
+
+
+dsa_decompose:
+  wrapper.DSA.encode_type: decompose
+  wrapper.OBS.cv_interpolate: area
+  wrapper.OBS.vector2image_type: "row"
+  wrapper.FSM.ensure_norm_reward: true
+  wrapper.DSA.dense_reward: true

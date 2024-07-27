@@ -18,6 +18,9 @@ class DSA(BaseWrapper):
                  encoding_id_zoom_box=200,
                  zoom_movement_type="continuous",
                  dsa_key=["psm1", "stuff"],
+                 out_reward_xy=1e-8,
+                 out_reward_z=5e-6,
+                 dense_reward=False,
                  **kwargs
                  ):
         super().__init__(env,)
@@ -30,6 +33,9 @@ class DSA(BaseWrapper):
                                  "psm1": encoding_id_psm1, "zoom_box": encoding_id_zoom_box}
         self._zoom_movement_type = zoom_movement_type
         self._dsa_key = dsa_key
+        self._out_reward_xy = out_reward_xy
+        self._out_reward_z = out_reward_z
+        self._dense_reward = dense_reward
         self._reset_vars()
 
     def step(self, action):
@@ -204,6 +210,75 @@ class DSA(BaseWrapper):
                 _mask_mat, zoom_x_min, zoom_x_max, zoom_y_min, zoom_y_max)
             im_pre = np.stack([layer1, layer2, layer3], axis=2)
             img_dsa = im_pre
+        elif self._encode_type in ["decompose"]:
+            zoom_box_length = self._zoom_box_fix_length_ratio * min(
+                zoom_mask.shape[0], zoom_mask.shape[1]
+            )
+            zoom_x_min, zoom_x_max, zoom_y_min, zoom_y_max = self._get_zoom_coordinate(
+                zoom_box_x, zoom_box_y, zoom_box_length, zoom_mask.shape
+            )
+            _union_mask = None
+            for k, v in img["mask"+pfix].items():
+                if k in self._dsa_key:
+                    _box_r, _box_c, _, _ = self._get_box_from_masks(v)
+                    _ratio = 0.5
+                    _l = int(zoom_box_length * _ratio)
+                    # print("length", zoom_box_length, _l)
+                    _box_r = list(_box_r)
+                    _box_c = list(_box_c)
+                    _box_r[0], _box_r[1] = self._get_legal_min_max_continuous(
+                        _box_r[0], _box_r[1], _l, zoom_mask.shape[0])
+                    _box_c[0], _box_c[1] = self._get_legal_min_max_continuous(
+                        _box_c[0], _box_c[1], _l, zoom_mask.shape[1])
+                    if k == "stuff":
+                        stuff_x = _box_r
+                        stuff_y = _box_c
+                    _union_mask = (
+                        _union_mask | v) if _union_mask is not None else v
+            zoom_cx = (zoom_x_min + zoom_x_max)//2
+            zoom_cy = (zoom_y_min + zoom_y_max)//2
+            zoom_cz = np.median(img["depth"+pfix][img["mask"+pfix][self._zoom_box_obj]])
+            stuff_cx = (stuff_x[0] + stuff_x[1]) // 2
+            stuff_cy = (stuff_y[0] + stuff_y[1]) // 2
+            stuff_cz = np.median(img["depth"+pfix][img["mask"+pfix]["stuff"]])
+            is_out = self._zoom2stuff(
+                zoom_cx,
+                zoom_cy,
+                zoom_cz,
+                stuff_cx,
+                stuff_cy,
+                stuff_cz,
+                img["depth"+pfix].shape[0],
+                img["depth"+pfix].shape[1],
+                self._zoom_box_fix_length_ratio,
+            )
+            layer1 = np.zeros(img["rgb" + pfix].shape[0:2], dtype=np.uint8)
+            layer2 = np.zeros(img["rgb"+pfix].shape[0:2], dtype=np.uint8)
+            layer3 = np.zeros(img["rgb" + pfix].shape[0:2], dtype=np.uint8)
+            if is_out:
+                _w = img["rgb" + pfix].shape[0] 
+                _h = img["rgb" + pfix].shape[1] 
+                _k = int(_w * self._zoom_box_fix_length_ratio // 2)
+                c = lambda i, min, max: np.clip(i, min, max)
+                # print(_k)
+                layer2[c(zoom_cx-_k, 0, _w-1) : c(zoom_cx+_k, 0, _w-1), 
+                       c(zoom_cy-_k, 0, _h-1) : c(zoom_cy+_k, 0, _h-1)] = zoom_cz
+                # print(zoom_cz)
+                # print(stuff_cz)
+                layer3[c(stuff_cx-_k, 0, _w-1) : c(stuff_cx+_k, 0, _w-1), 
+                       c(stuff_cy-_k, 0, _h-1) : c(stuff_cy+_k, 0, _h-1)] = stuff_cz
+            else:
+                depth_seg_mat = self._segment(img["depth"+pfix], _union_mask)
+                layer2 = self._zoom_legal(
+                    depth_seg_mat, zoom_x_min, zoom_x_max, zoom_y_min, zoom_y_max)
+                _mask_mat = np.zeros(img["rgb"+pfix].shape[0:2], dtype=np.uint8)
+                for k, v in img["mask"+pfix].items():
+                    if k in self._dsa_key:
+                        _mask_mat[v] = self._image_encode_id[k]
+                layer3 = self._zoom_legal(
+                    _mask_mat, zoom_x_min, zoom_x_max, zoom_y_min, zoom_y_max)
+            im_pre = np.stack([layer1, layer2, layer3], axis=2)
+            img_dsa = im_pre
 
         if self._timestep_prv != self.env.timestep:
             self._zoom_coordinate_prv = (
@@ -217,6 +292,43 @@ class DSA(BaseWrapper):
         m2 = margin * (zoom_y[1] - zoom_y[0]) / 2
         self._out_zoom = (stuff_x[0] > zoom_x[1]-m1) or (stuff_x[1] < zoom_x[0]+m1) or (
             stuff_y[0] > zoom_y[1]-m2) or (stuff_y[1] < zoom_y[0]+m2)
+
+    def _zoom2stuff(
+        self,
+        zoom_cx,
+        zoom_cy,
+        zoom_cz,
+        stuff_cx,
+        stuff_cy,
+        stuff_cz,
+        width,
+        height,
+        zoom_box_ratio,
+    ):
+        lx = int(width * zoom_box_ratio // 2) 
+        ly = int(height * zoom_box_ratio // 2) 
+        lz = int(255 * zoom_box_ratio // 2) 
+        x = np.clip(np.abs(stuff_cx - zoom_cx) - lx, 0, None)
+        y = np.clip(np.abs(stuff_cy - zoom_cy) - ly, 0, None)
+        z = np.clip(np.abs(stuff_cz - zoom_cz) - lz, 0, None)
+        is_out = (x+y+z) >0
+        self._out_zoom = is_out
+        xy_r = -(x**2 + y**2) * self._out_reward_xy
+        z_r = -z * self._out_reward_z
+        # print("xy reward:", xy_r, "z reward", z_r)
+        self._dsa_reward = xy_r + z_r
+        return is_out
+
+    @property
+    def reward_dict(
+        self,
+    ):
+        if self._dense_reward:
+            di = self.env.reward_dict.copy()
+            di["prog_abnorm_3"] = self._dsa_reward
+            return di
+        else:
+            return self.env.reward_dict
 
     @property
     def is_out_dsa_zoom(self,):
