@@ -261,10 +261,16 @@ class DSA(BaseWrapper):
                 _k = int(_w * self._zoom_box_fix_length_ratio // 2)
                 c = lambda i, min, max: np.clip(i, min, max)
                 # print(_k)
-                layer2[c(zoom_cx-_k, 0, _w-1) : c(zoom_cx+_k, 0, _w-1), 
+                layer2[
+                    c(zoom_cx - _k, 0, _w - 1) : c(zoom_cx + _k, 0, _w - 1),
+                    c(zoom_cy - _k, 0, _h - 1) : c(zoom_cy + _k, 0, _h - 1),
+                ] = self._image_encode_id["zoom_box"]
+                layer2[
+                    c(stuff_cx - _k, 0, _w - 1) : c(stuff_cx + _k, 0, _w - 1),
+                    c(stuff_cy - _k, 0, _h - 1) : c(stuff_cy + _k, 0, _h - 1),
+                ] = self._image_encode_id["stuff"]
+                layer3[c(zoom_cx-_k, 0, _w-1) : c(zoom_cx+_k, 0, _w-1), 
                        c(zoom_cy-_k, 0, _h-1) : c(zoom_cy+_k, 0, _h-1)] = zoom_cz
-                # print(zoom_cz)
-                # print(stuff_cz)
                 layer3[c(stuff_cx-_k, 0, _w-1) : c(stuff_cx+_k, 0, _w-1), 
                        c(stuff_cy-_k, 0, _h-1) : c(stuff_cy+_k, 0, _h-1)] = stuff_cz
             else:
