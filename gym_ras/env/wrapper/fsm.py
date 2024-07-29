@@ -39,8 +39,14 @@ class FSM(BaseWrapper):
         obs, reward, done, info = self.env.step(action)
 
         if self._dsa_out_zoom_anamaly:
-            if self.env.is_out_dsa_zoom and info["fsm"] != "done_success":
-                info["fsm"] = "prog_abnorm_3"
+            if self.env.is_out_dsa_zoom: 
+                if not info["fsm"] in [
+                    "done_success",
+                    "done_fail",
+                    "prog_abnorm_1",
+                    "prog_abnorm_2",
+                ]:
+                    info["fsm"] = "prog_abnorm_3"
 
         fsm_state = info["fsm"]
 

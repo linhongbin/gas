@@ -11,7 +11,7 @@ class GraspAny(GraspAnyBase):
     WORKSPACE_LIMITS1 = (
         (0.50, 0.60),
         (-0.05 - 0.02, 0.05 + 0.02),
-        (0.675 + 0.0088, 0.745 + 0.01),
+        (0.675 + 0.0088, 0.745),
     )
 
     def __init__(
@@ -36,14 +36,16 @@ class GraspAny(GraspAnyBase):
         **kwargs,
     ): 
         if not on_plane:
-            _z_level = 0.035
+            _z_level = -0.035
             # _z_level = 0.0
             # self.WORKSPACE_LIMITS1 = (
             #     (0.50, 0.60),
             #     (-0.05 - 0.02, 0.05 + 0.02),
             #     (0.675 + 0.0088 + _z_level, 0.745 + 0.01 + _z_level),
             # )
-            self.POSE_TRAY = ((0.55, 0, 0.6751 - _z_level), (0, 0, 0))
+        else:
+            _z_level = 0.0025
+        self.POSE_TRAY = ((0.55, 0, 0.6751 + _z_level), (0, 0, 0))
         self._init_pose_ratio_low_gripper = init_pose_ratio_low_gripper
         self._init_pose_ratio_high_gripper = init_pose_ratio_high_gripper
         self._init_pose_ratio_low_stuff = init_pose_ratio_low_stuff
@@ -72,15 +74,23 @@ class GraspAny(GraspAnyBase):
         asset_path = (
             Path(__file__).resolve().parent.parent.parent.parent / "asset" / "urdf"
         )
-        file_dir = {
-            "needle": [
-                "needle_40mm_RL.urdf",
-            ],
-            # "box": ["bar2.urdf", "bar.urdf", "box.urdf"],
-            # "box": ["bar2.urdf"],
-            # "block_haptic.urdf",
-        }
 
+        if self._on_plane:
+            file_dir = {
+                "needle": [
+                    "needle_40mm_RL.urdf",
+                ],
+                "box": ["bar2.urdf", "bar.urdf", "box.urdf"],
+            }
+        else:
+            file_dir = {
+                "needle": [
+                    "needle_40mm_RL.urdf",
+                ],
+                # "box": ["bar2.urdf", "bar.urdf", "box.urdf"],
+                # "box": ["bar2.urdf"],
+                # "block_haptic.urdf",
+            }
         file_dir = {k: [asset_path / k / _v for _v in v] for k, v in file_dir.items()}
 
         if self._stuff_name == "any":
@@ -164,45 +174,28 @@ class GraspAny(GraspAnyBase):
         pos = pose[:3]
         p.resetBasePositionAndOrientation(self.obj_ids["rigid"][0], pos, quat)
 
-        body_pose = p.getBasePositionAndOrientation(self.obj_ids["fixed"][1])
-        # body_pose = p.getLinkState(self.obj_ids['fixed'][1], -1)
-        obj_pose = p.getLinkState(self.obj_id, self.obj_link1)
-        world_to_body = p.invertTransform(body_pose[0], body_pose[1])
-        obj_to_body = p.multiplyTransforms(world_to_body[0],
-                                        world_to_body[1],
-                                        obj_pose[0], obj_pose[1])       
-        self._init_stuff_constraint = p.createConstraint(
-            parentBodyUniqueId=self.obj_ids["fixed"][1],
-            parentLinkIndex=-1,
-            childBodyUniqueId=self.obj_id,
-            childLinkIndex=self.obj_link1,
-            jointType=p.JOINT_FIXED,
-            jointAxis=(0, 0, 0),
-            parentFramePosition=obj_to_body[0],
-            parentFrameOrientation=obj_to_body[1],
-            childFramePosition=(0, 0, 0),
-            childFrameOrientation=(0, 0, 0),
-        )
+        if not self._on_plane:
+            body_pose = p.getBasePositionAndOrientation(self.obj_ids["fixed"][1])
+            # body_pose = p.getLinkState(self.obj_ids['fixed'][1], -1)
+            obj_pose = p.getLinkState(self.obj_id, self.obj_link1)
+            world_to_body = p.invertTransform(body_pose[0], body_pose[1])
+            obj_to_body = p.multiplyTransforms(world_to_body[0],
+                                            world_to_body[1],
+                                            obj_pose[0], obj_pose[1])       
+            self._init_stuff_constraint = p.createConstraint(
+                parentBodyUniqueId=self.obj_ids["fixed"][1],
+                parentLinkIndex=-1,
+                childBodyUniqueId=self.obj_id,
+                childLinkIndex=self.obj_link1,
+                jointType=p.JOINT_FIXED,
+                jointAxis=(0, 0, 0),
+                parentFramePosition=obj_to_body[0],
+                parentFrameOrientation=obj_to_body[1],
+                childFramePosition=(0, 0, 0),
+                childFrameOrientation=(0, 0, 0),
+            )
 
-        p.changeConstraint(self._init_stuff_constraint, maxForce=20)
-
-        # self._contact_constraint = p.createConstraint(
-        #     parentBodyUniqueId=self.obj_ids['fixed'][1],
-        #     parentLinkIndex=-1,
-        #     childBodyUniqueId=self.obj_ids["rigid"][0],
-        #     childLinkIndex=-1,
-        #     jointType=p.JOINT_FIXED,
-        #     jointAxis=(0, 0, 0),
-        #     parentFramePosition=obj_to_body[0],
-        #     parentFrameOrientation=obj_to_body[1],
-        #     childFramePosition=(0, 0, 0),
-        #     childFrameOrientation=(0, 0, 0))
-        #             p.changeConstraint(self._contact_constraint, maxForce=20)
-
-        # p.setCollisionFilterPair(bodyUniqueIdA=self.psm1.body, bodyUniqueIdB=self.obj_id,
-        #                             linkIndexA=6, linkIndexB=-1, enableCollision=0)
-        # p.setCollisionFilterPair(bodyUniqueIdA=self.psm1.body, bodyUniqueIdB=self.obj_id,
-        #                             linkIndexA=7, linkIndexB=-1, enableCollision=0)
+            p.changeConstraint(self._init_stuff_constraint, maxForce=20)
 
     def reset(self):
         obs = super().reset()
