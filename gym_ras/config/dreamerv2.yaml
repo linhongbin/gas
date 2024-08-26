@@ -225,6 +225,7 @@ gas:
   prefill: { random: 7e3, oracle: 3e3 }
   steps: 1820000
 
+
 mlp:
   encoder: { mlp_keys: "vector", cnn_keys: "image" }
   decoder: { mlp_keys: "vector", cnn_keys: "image" }
@@ -233,7 +234,7 @@ free_ram:
   replay.free_ram_capacity: 1000
 
 low_ram1:
-  replay.capacity: 1e5 # limit ram usage
+  replay.capacity: 2e5 # limit ram usage
 low_ram2:
   replay.capacity: 1e4 # limit ram usage
 
@@ -242,7 +243,7 @@ no_oracle:
 low_oracle:
   prefill: { random: 97e2, oracle: 3e2 }
 high_oracle:
-  prefill: { random: 7e3, oracle: 3e3 }
+  prefill: { random: 7e3, oracle: 3e4 }
 
 debug_prefill:
   prefill: { random: 10, oracle: 10 }

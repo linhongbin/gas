@@ -3,14 +3,13 @@ default:
   wrapper:
     pipeline:
       [
-        "ActionSmooth",
+        "ActionNoise",
         "ImageNoise",
+        "TimeLimit",
+        "DiscreteAction",
         "DepthProcess",
         "DSA",
         "VirtualClutch",
-        "ActionNoise",
-        "DiscreteAction",
-        "TimeLimit",
         "FSM",
         "OBS",
       ]
@@ -25,13 +24,14 @@ default:
         encoding_id_psm1: 130,
         encoding_id_zoom_box: 30,
         zoom_movement_type: continuous,
+        dense_reward: false,
       }
     VirtualClutch: { start: 6 }
     ActionNoise: { noise_scale: 0.0 }
     DiscreteAction: { action_scale: 0.2 }
     TimeLimit: { max_timestep: 200 }
     DepthProcess: { skip: true, uncert_scale: 1.0, eval: false }
-    FSM: { arg: 0 }
+    FSM: { arg: 0 , ensure_norm_reward: false,  dsa_out_zoom_anamaly: false,}
     OBS:
       {
         image_obs_key: ["dsa"],
@@ -41,8 +41,8 @@ default:
         is_vector2image: true,
         image_resize: [64, 64],
         vector2image_type: "row",
-        dsa_out_zoom_anamaly: false,
         action_insertion_anamaly: false,
+        cv_interpolate: "area"
       }
     ImageNoise:
       {
@@ -104,8 +104,8 @@ default:
         done_z_thres: 0.2
         init_pose_ratio_low_gripper: [-0.5, -0.5, -0.5, -0.9]
         init_pose_ratio_high_gripper: [0.5, 0.5, 0.5, 0.9]
-        init_pose_ratio_low_stuff: [-0.5, -0.5, 0.1, -0.99]
-        init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99]
+        init_pose_ratio_low_stuff: [-0.5, -0.5, 0.1, -0.99, -0.99, -0.99]
+        init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99, 0.99, 0.99]
         random_obj_vis: false
         depth_distance: 0.3
       peg_transfer:
@@ -129,6 +129,9 @@ default:
         init_pose_ratio_high_stuff: [0.5, 0.5, 0.5, 0.99]
         random_obj_vis: false
         depth_distance: 0.3
+        on_plane: true
+        oracle_pos_thres: 1e-3
+        oracle_rot_thres: 3e-1
     dVRKEnv:
       grasp_any:
         arm_names: ["PSM1"]
@@ -394,6 +397,7 @@ dsa_3:
 dsa_iros2023:
   wrapper.DSA.encode_type: IROS2023
   wrapper.DSA.zoom_box_obj: needle
+
 dsa_discrete:
   wrapper.DSA.zoom_movement_type: discrete
 
@@ -456,7 +460,7 @@ reward6:
   embodied.SurrolEnv.reward_done_success: 1
 
 dsa_anomaly:
-  wrapper.OBS.dsa_out_zoom_anamaly: true
+  wrapper.FSM.dsa_out_zoom_anamaly: true
 
 ###### disturbance ########
 disturbance:
@@ -566,7 +570,7 @@ gas_surrol:
   # dsa_3:
   wrapper.DSA.encode_type: general_simple3
   # dsa_anomaly:
-  wrapper.OBS.dsa_out_zoom_anamaly: true
+  wrapper.FSM.dsa_out_zoom_anamaly: true
   # reward5:
   embodied.SurrolEnv.reward_prog_abnorm_1: -0.01
   embodied.SurrolEnv.reward_prog_abnorm_2: -0.01 # sliding
@@ -580,8 +584,8 @@ gas_surrol:
   embodied.SurrolEnv.grasp_any.init_pose_ratio_high_gripper:
     [0.9, 0.9, 0.9, 0.9]
   embodied.SurrolEnv.grasp_any.init_pose_ratio_low_stuff:
-    [-0.8, -0.8, 0.1, -0.99]
-  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99]
+    [-0.8, -0.8, 0.1, -0.99,-0.99,-0.99]
+  embodied.SurrolEnv.grasp_any.init_pose_ratio_high_stuff: [0.8, 0.8, 0.5, 0.99, 0.99, 0.99]
   wrapper.TimeLimit: { max_timestep: 300 }
   # disturbance2:
   embodied.SurrolEnv.disturbance_scale: 0.01
@@ -590,6 +594,10 @@ gas_surrol:
   # vector2image_square:
   wrapper.OBS.vector2image_type: "square"
 
+grasp_standing_needle:
+  embodied.SurrolEnv.grasp_any.on_plane: false
+  embodied.SurrolEnv.grasp_any.oracle_pos_thres: 15e-4
+  wrapper.ActionNoise.noise_scale: 0.01
 raw:
   wrapper.DSA.encode_type: raw
 no_depth_estimation:
@@ -625,3 +633,11 @@ image_noise_on:
 
 action_noise_on:
   wrapper.ActionNoise.noise_scale: 0.04
+
+
+dsa_decompose:
+  wrapper.DSA.encode_type: decompose
+  wrapper.OBS.cv_interpolate: area
+  wrapper.OBS.vector2image_type: "row"
+  wrapper.FSM.ensure_norm_reward: true
+  wrapper.DSA.dense_reward: true

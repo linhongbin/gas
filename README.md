@@ -30,7 +30,7 @@ git submodule update --init --recursive
 
 - Install package 
     ```sh
-    source init.sh
+    source bash/init_surrol.sh
     conda install cudnn=8.2 cudatoolkit=11.3 libffi==3.3 ffmpeg -c anaconda -c conda-forge -y
     pushd ext/SurRoL/ && python -m pip install -e . && popd # install surrol
     pushd ext/dreamerv2/ && python -m pip install -e . && popd # install dreamerv2

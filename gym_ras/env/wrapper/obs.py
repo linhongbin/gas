@@ -50,12 +50,12 @@ class OBS(BaseWrapper):
                 reward = self.env.reward_dict[_str]
                 info["fsm"] = _str
         obs = self._get_obs(obs)
-        if self._dsa_out_zoom_anamaly:
-            if self.env.is_out_dsa_zoom and info["fsm"] != "done_success":
-                _str = "prog_abnorm_3"
-                obs['fsm_state'] = self.env.fsm_states.index(_str)
-                reward = self.env.reward_dict[_str]
-                info["fsm"] = _str
+        # if self._dsa_out_zoom_anamaly:
+        #     if self.env.is_out_dsa_zoom and info["fsm"] != "done_success":
+        #         _str = "prog_abnorm_3"
+        #         obs['fsm_state'] = self.env.fsm_states.index(_str)
+        #         reward = self.env.reward_dict[_str]
+        #         info["fsm"] = _str
 
         return obs, reward, done, info
 
@@ -139,11 +139,18 @@ class OBS(BaseWrapper):
         _value_norm = _value_norm.astype(np.uint8)
         # print("jj",_value_norm)
         if self._vector2image_type == "row":
+            # print(_value_norm.shape)
+            extend_d = 32
+            _value_norm_l = np.zeros((_value_norm.shape[0] * extend_d,), dtype=np.uint8)
             # print(_value_norm)
+            for i in range(_value_norm.shape[0]):
+                _value_norm_l[i * extend_d: (i + 1) * extend_d] = _value_norm[i]
+            # print(_value_norm_l)
+            _value_norm = _value_norm_l
             _value_norm = np.tile(_value_norm, (image.shape[0], 1))
             _value_norm = np.transpose(_value_norm)
             s = image.shape[0]
-            image[s-_value_norm.shape[0]:s+1, :, fill_channel] = _value_norm
+            image[s-_value_norm.shape[0]:, :, fill_channel] = _value_norm
         elif self._vector2image_type == "square":
             ROW_SIZE = 6
             for _v in range(_value_norm.shape[0]):

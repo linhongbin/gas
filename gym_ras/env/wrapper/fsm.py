@@ -16,10 +16,14 @@ class FSM(BaseWrapper):
                      "done_fail",  # done, failure case
                      "done_success",  # done success case
                  ],
+                 ensure_norm_reward = False,
+                 dsa_out_zoom_anamaly = True,
                  **kwargs
                  ):
         super().__init__(env)
+        self._ensure_norm_reward = ensure_norm_reward
         self._states = states
+        self._dsa_out_zoom_anamaly = dsa_out_zoom_anamaly
 
     def reset(self):
         obs = self.env.reset()
@@ -33,8 +37,23 @@ class FSM(BaseWrapper):
 
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
+
+        if self._dsa_out_zoom_anamaly:
+            if self.env.is_out_dsa_zoom: 
+                if not info["fsm"] in [
+                    "done_success",
+                    "done_fail",
+                    "prog_abnorm_1",
+                    "prog_abnorm_2",
+                ]:
+                    info["fsm"] = "prog_abnorm_3"
+
         fsm_state = info["fsm"]
-        reward = self.unwrapped.reward_dict[fsm_state]
+
+        # print(self.env.reward_cdict)
+        reward = self.env.reward_dict[fsm_state]
+        if self._ensure_norm_reward and fsm_state != "prog_norm":
+            reward += self.unwrapped.reward_dict["prog_norm"]
         info['is_success'] = fsm_state == "done_success"
         if fsm_state in ["done_success", "done_fail"]:
             done = True

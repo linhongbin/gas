@@ -74,7 +74,6 @@ class ImageNoise(BaseWrapper):
     def _post_process(self, img):
         for k in self._image_key:
             img[k] = self._add_pepper_and_salt_nosie(img[k])
-
         for k in self._image_key:
             img[k] = self._add_uniform_noise(img[k], self._uniform_noise_range)
 
@@ -91,6 +90,7 @@ class ImageNoise(BaseWrapper):
         return img
 
     def _cutout_protocol(self, img, mask_min, mask_max=0.9, only_depth=False):
+
         return_img = deepcopy(img)
         for loop in range(self._max_loop):
             _img = deepcopy(img)
@@ -145,15 +145,19 @@ class ImageNoise(BaseWrapper):
         out = np.copy(image)
         # Salt mode
         num_salt = np.ceil(amount * image.size * s_vs_p)
-        coords = [np.random.randint(0, i - 1, int(num_salt))
-                  for i in image.shape]
-        out[coords] = 1
+        _out = out.reshape(-1)
+        # coords = [np.random.randint(0, i - 1, int(2)).tolist() for i in image.shape]
+        coords = np.random.randint(0, int(image.size) - 1, int(num_salt))
+        _out[coords] = 1
+        out = _out.reshape(image.shape)
 
         # Pepper mode
         num_pepper = np.ceil(amount * image.size * (1. - s_vs_p))
-        coords = [np.random.randint(0, i - 1, int(num_pepper))
-                  for i in image.shape]
-        out[coords] = 0
+        _out = out.reshape(-1)
+        # coords = [np.random.randint(0, i - 1, int(2)).tolist() for i in image.shape]
+        coords = np.random.randint(0, int(image.size) - 1, int(num_pepper))
+        _out[coords] = 0
+        out = _out.reshape(image.shape)
         return out
 
     def _draw_rec(self, image, cx, cy, width, height, angle, rgb_list):
@@ -234,5 +238,5 @@ class ImageNoise(BaseWrapper):
         image_noise_seed = np.uint32(seed)
         print("image_noise_seed:", image_noise_seed)
         self._image_noise_rng = np.random.RandomState(image_noise_seed)
-        if self.env.is_wrapper:
+        if self.is_wrapper:
             self.env._init_rng(self.env.seed)
