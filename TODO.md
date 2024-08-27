@@ -20,3 +20,10 @@ exp:
 - [ ] change masking object based on stereo's depth
 - [ ] broadcasting dsa scalar signals to channel's level
 - [ ] smoother motion by remove the blocking of psm's commands (maybe threading)
+
+
+2024-08-27 (after trials in robots)
+code
+- [ ] needle on uneven z-level ground
+- [ ] reduce hitting the ground
+- [ ] define task that with (1) only needle (2) limitted grasp trials (3) endoscopic depth setting, cam distance, angle, and the choices of masks (4) limited timesteps, wwwww
