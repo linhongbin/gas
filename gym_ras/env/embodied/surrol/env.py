@@ -73,6 +73,10 @@ class SurrolEnv(BaseEnv):
             from gym_ras.env.embodied.surrol.grasp_any import GraspAny
             client = GraspAny(
                 render_mode="human" if pybullet_gui else "rgb_array", cid=cid, **kwargs)
+        elif task == "grasp_any_v2":
+            from gym_ras.env.embodied.surrol.grasp_any_v2 import GraspAnyV2
+            client = GraspAnyV2(
+                render_mode="human" if pybullet_gui else "rgb_array", cid=cid, **kwargs)
         else:
             raise Exception("Not support")
 
